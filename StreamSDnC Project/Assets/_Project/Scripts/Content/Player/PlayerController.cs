@@ -44,12 +44,12 @@ namespace Player{
 
         private void Awake()
         {
+            LevelManager.Instance.SetPlayer(this);
             ctx = new PlayerContext(transform, this, data);
             sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
             {
                 // Add the states here: new MainState(this),
             });
-
         }
         private void Update()
         {
