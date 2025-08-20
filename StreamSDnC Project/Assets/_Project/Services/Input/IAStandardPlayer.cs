@@ -46,6 +46,33 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""2cb449d7-6776-494a-a57c-b2a19561d781"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""4973b95e-455e-4feb-b3f4-273272587c12"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Crouch"",
+                    ""type"": ""Button"",
+                    ""id"": ""6ffc224e-67e0-4602-9fe3-0399a4462bfe"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -114,6 +141,87 @@ namespace Controls
                     ""action"": ""Mouse"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dcb86223-1b86-4d52-a039-006cba95fa18"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5e725cfc-bcac-4591-9ef7-a946d813a94e"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""07e01127-e008-4de0-97da-384f29eac4b5"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Firing"",
+            ""id"": ""20c183de-445f-4d35-9cf3-8c797266de0e"",
+            ""actions"": [
+                {
+                    ""name"": ""HoldFire"",
+                    ""type"": ""Button"",
+                    ""id"": ""ccde2084-abc3-4de9-8fd9-2972895ac791"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PressFire"",
+                    ""type"": ""Button"",
+                    ""id"": ""d343f990-3927-438c-adc4-02d00494f3fb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""29f11af6-e361-4be9-8daa-230a9ac2c7d6"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HoldFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c24a7df8-1d4e-4291-8cef-b407b17dd74e"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PressFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -141,11 +249,19 @@ namespace Controls
             m_Main = asset.FindActionMap("Main", throwIfNotFound: true);
             m_Main_Move = m_Main.FindAction("Move", throwIfNotFound: true);
             m_Main_Mouse = m_Main.FindAction("Mouse", throwIfNotFound: true);
+            m_Main_Jump = m_Main.FindAction("Jump", throwIfNotFound: true);
+            m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
+            m_Main_Crouch = m_Main.FindAction("Crouch", throwIfNotFound: true);
+            // Firing
+            m_Firing = asset.FindActionMap("Firing", throwIfNotFound: true);
+            m_Firing_HoldFire = m_Firing.FindAction("HoldFire", throwIfNotFound: true);
+            m_Firing_PressFire = m_Firing.FindAction("PressFire", throwIfNotFound: true);
         }
 
         ~@IAStandardPlayer()
         {
             UnityEngine.Debug.Assert(!m_Main.enabled, "This will cause a leak and performance issues, IAStandardPlayer.Main.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Firing.enabled, "This will cause a leak and performance issues, IAStandardPlayer.Firing.Disable() has not been called.");
         }
 
         public void Dispose()
@@ -209,12 +325,18 @@ namespace Controls
         private List<IMainActions> m_MainActionsCallbackInterfaces = new List<IMainActions>();
         private readonly InputAction m_Main_Move;
         private readonly InputAction m_Main_Mouse;
+        private readonly InputAction m_Main_Jump;
+        private readonly InputAction m_Main_Run;
+        private readonly InputAction m_Main_Crouch;
         public struct MainActions
         {
             private @IAStandardPlayer m_Wrapper;
             public MainActions(@IAStandardPlayer wrapper) { m_Wrapper = wrapper; }
             public InputAction @Move => m_Wrapper.m_Main_Move;
             public InputAction @Mouse => m_Wrapper.m_Main_Mouse;
+            public InputAction @Jump => m_Wrapper.m_Main_Jump;
+            public InputAction @Run => m_Wrapper.m_Main_Run;
+            public InputAction @Crouch => m_Wrapper.m_Main_Crouch;
             public InputActionMap Get() { return m_Wrapper.m_Main; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -230,6 +352,15 @@ namespace Controls
                 @Mouse.started += instance.OnMouse;
                 @Mouse.performed += instance.OnMouse;
                 @Mouse.canceled += instance.OnMouse;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
+                @Run.started += instance.OnRun;
+                @Run.performed += instance.OnRun;
+                @Run.canceled += instance.OnRun;
+                @Crouch.started += instance.OnCrouch;
+                @Crouch.performed += instance.OnCrouch;
+                @Crouch.canceled += instance.OnCrouch;
             }
 
             private void UnregisterCallbacks(IMainActions instance)
@@ -240,6 +371,15 @@ namespace Controls
                 @Mouse.started -= instance.OnMouse;
                 @Mouse.performed -= instance.OnMouse;
                 @Mouse.canceled -= instance.OnMouse;
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
+                @Run.started -= instance.OnRun;
+                @Run.performed -= instance.OnRun;
+                @Run.canceled -= instance.OnRun;
+                @Crouch.started -= instance.OnCrouch;
+                @Crouch.performed -= instance.OnCrouch;
+                @Crouch.canceled -= instance.OnCrouch;
             }
 
             public void RemoveCallbacks(IMainActions instance)
@@ -257,6 +397,60 @@ namespace Controls
             }
         }
         public MainActions @Main => new MainActions(this);
+
+        // Firing
+        private readonly InputActionMap m_Firing;
+        private List<IFiringActions> m_FiringActionsCallbackInterfaces = new List<IFiringActions>();
+        private readonly InputAction m_Firing_HoldFire;
+        private readonly InputAction m_Firing_PressFire;
+        public struct FiringActions
+        {
+            private @IAStandardPlayer m_Wrapper;
+            public FiringActions(@IAStandardPlayer wrapper) { m_Wrapper = wrapper; }
+            public InputAction @HoldFire => m_Wrapper.m_Firing_HoldFire;
+            public InputAction @PressFire => m_Wrapper.m_Firing_PressFire;
+            public InputActionMap Get() { return m_Wrapper.m_Firing; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(FiringActions set) { return set.Get(); }
+            public void AddCallbacks(IFiringActions instance)
+            {
+                if (instance == null || m_Wrapper.m_FiringActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_FiringActionsCallbackInterfaces.Add(instance);
+                @HoldFire.started += instance.OnHoldFire;
+                @HoldFire.performed += instance.OnHoldFire;
+                @HoldFire.canceled += instance.OnHoldFire;
+                @PressFire.started += instance.OnPressFire;
+                @PressFire.performed += instance.OnPressFire;
+                @PressFire.canceled += instance.OnPressFire;
+            }
+
+            private void UnregisterCallbacks(IFiringActions instance)
+            {
+                @HoldFire.started -= instance.OnHoldFire;
+                @HoldFire.performed -= instance.OnHoldFire;
+                @HoldFire.canceled -= instance.OnHoldFire;
+                @PressFire.started -= instance.OnPressFire;
+                @PressFire.performed -= instance.OnPressFire;
+                @PressFire.canceled -= instance.OnPressFire;
+            }
+
+            public void RemoveCallbacks(IFiringActions instance)
+            {
+                if (m_Wrapper.m_FiringActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            public void SetCallbacks(IFiringActions instance)
+            {
+                foreach (var item in m_Wrapper.m_FiringActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_FiringActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        public FiringActions @Firing => new FiringActions(this);
         private int m_MouseKeyboardSchemeIndex = -1;
         public InputControlScheme MouseKeyboardScheme
         {
@@ -270,6 +464,14 @@ namespace Controls
         {
             void OnMove(InputAction.CallbackContext context);
             void OnMouse(InputAction.CallbackContext context);
+            void OnJump(InputAction.CallbackContext context);
+            void OnRun(InputAction.CallbackContext context);
+            void OnCrouch(InputAction.CallbackContext context);
+        }
+        public interface IFiringActions
+        {
+            void OnHoldFire(InputAction.CallbackContext context);
+            void OnPressFire(InputAction.CallbackContext context);
         }
     }
 }

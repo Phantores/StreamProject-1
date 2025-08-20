@@ -13,3 +13,9 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   <moveSpeed>k__BackingField: 5
+  <jumpForce>k__BackingField: 10
+  <runMult>k__BackingField: 3
+  <crouchMult>k__BackingField: 0.25
+  <mouseSensitivity>k__BackingField: 0.2
+  <viewLimit>k__BackingField: 85
+  <terminalVelocity>k__BackingField: 40

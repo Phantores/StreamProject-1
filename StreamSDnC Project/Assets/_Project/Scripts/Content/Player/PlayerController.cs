@@ -6,15 +6,21 @@ namespace Player{
     {
         public readonly Transform Transform;
         public readonly MonoBehaviour Runner;
+        public readonly CameraController Camera;
         public PlayerData Data { get; private set; }
+
+        public WeaponHandler wh { get; private set; } = null;
 
         //
 
-        public PlayerContext(Transform t, MonoBehaviour runner, PlayerData data)
+        public PlayerContext(Transform t, MonoBehaviour runner, PlayerData data, CameraController camera)
         {
             Transform = t;
             Runner = runner;
             Data = data;
+            Camera = camera;
+
+            wh = new WeaponHandler();
         }
 
         public void UpdateData(PlayerData data)
@@ -40,17 +46,38 @@ namespace Player{
         PlayerSM sm;
         PlayerContext ctx;
 
+        [SerializeField] CameraController PlayerCamera;
+
         [field: SerializeField] public PlayerData data { get; private set; }
+
+        public CharacterController cc { get; private set; }
 
         private void Awake()
         {
-            LevelManager.Instance.SetPlayer(this);
-            ctx = new PlayerContext(transform, this, data);
+            if(PlayerCamera == null)
+            {
+                PlayerCamera = Camera.main.GetComponent<CameraController>();
+                if (PlayerCamera == null)
+                {
+                    Debug.LogError("No CameraController found on the main camera.");
+                }
+            } else
+            {
+                PlayerCamera.SetData(data.mouseSensitivity, data.viewLimit, this.gameObject);
+            }
+            cc = GetComponent<CharacterController>();
+            ctx = new PlayerContext(transform, this, data, PlayerCamera);
             sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
             {
-                // Add the states here: new MainState(this),
+                new OffState(this), new MainState(this),
             });
         }
+
+        private void Start()
+        {
+            LevelManager.Instance.SetPlayer(this);
+        }
+
         private void Update()
         {
             sm.SubUpdate(Time.deltaTime);
