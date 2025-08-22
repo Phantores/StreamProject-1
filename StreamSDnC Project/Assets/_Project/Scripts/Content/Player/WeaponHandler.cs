@@ -1,21 +1,24 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Player{
     public class WeaponHandler
     {
-        public enum HoldState { None, Main, Side}
+        public enum HoldState { None = 0, Main = 1, Side = 2}
         HoldState _holdState = HoldState.None;
 
         Weapon mainWeapon;
         Weapon sideWeapon;
 
-        int mainBullets = 0;
-        int sideBullets = 0;
+        CameraController _cameraCont;
 
-        public WeaponHandler()
+        public WeaponHandler(CameraController camera)
         {
-            
+            _cameraCont = camera;
         }
+        #region WeaponSetters
 
         public void PickWeapon(HoldState holdState)
         {
@@ -53,6 +56,20 @@ namespace Player{
                     return null;
             }
             return null;
+        }
+        #endregion
+
+        public void Shoot(float time, Weapon weapon)
+        {
+            Ray ray = _cameraCont.Camera.ScreenPointToRay(InputManager.Instance.MousePosition);
+            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            {
+                HealthComponent hitentity = hit.transform.gameObject.GetComponent<HealthComponent>();
+                if(hitentity != null)
+                {
+                    hitentity.Damage(weapon.data.GameData.damage);
+                }
+            }
         }
     }
 

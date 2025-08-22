@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
     float sensitivity = 1f;
@@ -11,6 +12,8 @@ public class CameraController : MonoBehaviour
     float verticalAngle = 0f;
 
     GameObject Parent;
+
+    public Camera Camera => this.gameObject.GetComponent<Camera>();
 
     public void SetData(float sens, float view, GameObject Par = null)
     {

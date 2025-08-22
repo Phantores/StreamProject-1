@@ -20,7 +20,7 @@ namespace Player{
             Data = data;
             Camera = camera;
 
-            wh = new WeaponHandler();
+            wh = new WeaponHandler(camera);
         }
 
         public void UpdateData(PlayerData data)

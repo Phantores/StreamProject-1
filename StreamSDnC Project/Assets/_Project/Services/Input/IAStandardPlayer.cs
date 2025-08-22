@@ -73,6 +73,15 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MousePos"",
+                    ""type"": ""Value"",
+                    ""id"": ""fe3fb842-003d-4f62-8a52-4d803a0f2e72"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -174,6 +183,17 @@ namespace Controls
                     ""action"": ""Crouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3d77f956-facb-4b11-9ca2-1f4ea88057e0"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""MousePos"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -198,6 +218,33 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChooseOne"",
+                    ""type"": ""Button"",
+                    ""id"": ""02226baf-1bbb-49ed-af24-97f676e3c406"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChooseTwo"",
+                    ""type"": ""Button"",
+                    ""id"": ""39fcfda1-1872-4a35-a1b2-ed5bedf044a1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Holster"",
+                    ""type"": ""Button"",
+                    ""id"": ""457627a8-837b-4fd6-bd74-ae43ea1d470f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -220,6 +267,39 @@ namespace Controls
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PressFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7a81174c-b5e4-4e26-80df-8c8d7a5d993c"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""ChooseOne"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b0aaf11-b703-404f-ac35-cfc0b6fb798d"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""ChooseTwo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c737184b-0701-4135-b476-db6ace99d17d"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""Holster"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -252,10 +332,14 @@ namespace Controls
             m_Main_Jump = m_Main.FindAction("Jump", throwIfNotFound: true);
             m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
             m_Main_Crouch = m_Main.FindAction("Crouch", throwIfNotFound: true);
+            m_Main_MousePos = m_Main.FindAction("MousePos", throwIfNotFound: true);
             // Firing
             m_Firing = asset.FindActionMap("Firing", throwIfNotFound: true);
             m_Firing_HoldFire = m_Firing.FindAction("HoldFire", throwIfNotFound: true);
             m_Firing_PressFire = m_Firing.FindAction("PressFire", throwIfNotFound: true);
+            m_Firing_ChooseOne = m_Firing.FindAction("ChooseOne", throwIfNotFound: true);
+            m_Firing_ChooseTwo = m_Firing.FindAction("ChooseTwo", throwIfNotFound: true);
+            m_Firing_Holster = m_Firing.FindAction("Holster", throwIfNotFound: true);
         }
 
         ~@IAStandardPlayer()
@@ -328,6 +412,7 @@ namespace Controls
         private readonly InputAction m_Main_Jump;
         private readonly InputAction m_Main_Run;
         private readonly InputAction m_Main_Crouch;
+        private readonly InputAction m_Main_MousePos;
         public struct MainActions
         {
             private @IAStandardPlayer m_Wrapper;
@@ -337,6 +422,7 @@ namespace Controls
             public InputAction @Jump => m_Wrapper.m_Main_Jump;
             public InputAction @Run => m_Wrapper.m_Main_Run;
             public InputAction @Crouch => m_Wrapper.m_Main_Crouch;
+            public InputAction @MousePos => m_Wrapper.m_Main_MousePos;
             public InputActionMap Get() { return m_Wrapper.m_Main; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -361,6 +447,9 @@ namespace Controls
                 @Crouch.started += instance.OnCrouch;
                 @Crouch.performed += instance.OnCrouch;
                 @Crouch.canceled += instance.OnCrouch;
+                @MousePos.started += instance.OnMousePos;
+                @MousePos.performed += instance.OnMousePos;
+                @MousePos.canceled += instance.OnMousePos;
             }
 
             private void UnregisterCallbacks(IMainActions instance)
@@ -380,6 +469,9 @@ namespace Controls
                 @Crouch.started -= instance.OnCrouch;
                 @Crouch.performed -= instance.OnCrouch;
                 @Crouch.canceled -= instance.OnCrouch;
+                @MousePos.started -= instance.OnMousePos;
+                @MousePos.performed -= instance.OnMousePos;
+                @MousePos.canceled -= instance.OnMousePos;
             }
 
             public void RemoveCallbacks(IMainActions instance)
@@ -403,12 +495,18 @@ namespace Controls
         private List<IFiringActions> m_FiringActionsCallbackInterfaces = new List<IFiringActions>();
         private readonly InputAction m_Firing_HoldFire;
         private readonly InputAction m_Firing_PressFire;
+        private readonly InputAction m_Firing_ChooseOne;
+        private readonly InputAction m_Firing_ChooseTwo;
+        private readonly InputAction m_Firing_Holster;
         public struct FiringActions
         {
             private @IAStandardPlayer m_Wrapper;
             public FiringActions(@IAStandardPlayer wrapper) { m_Wrapper = wrapper; }
             public InputAction @HoldFire => m_Wrapper.m_Firing_HoldFire;
             public InputAction @PressFire => m_Wrapper.m_Firing_PressFire;
+            public InputAction @ChooseOne => m_Wrapper.m_Firing_ChooseOne;
+            public InputAction @ChooseTwo => m_Wrapper.m_Firing_ChooseTwo;
+            public InputAction @Holster => m_Wrapper.m_Firing_Holster;
             public InputActionMap Get() { return m_Wrapper.m_Firing; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -424,6 +522,15 @@ namespace Controls
                 @PressFire.started += instance.OnPressFire;
                 @PressFire.performed += instance.OnPressFire;
                 @PressFire.canceled += instance.OnPressFire;
+                @ChooseOne.started += instance.OnChooseOne;
+                @ChooseOne.performed += instance.OnChooseOne;
+                @ChooseOne.canceled += instance.OnChooseOne;
+                @ChooseTwo.started += instance.OnChooseTwo;
+                @ChooseTwo.performed += instance.OnChooseTwo;
+                @ChooseTwo.canceled += instance.OnChooseTwo;
+                @Holster.started += instance.OnHolster;
+                @Holster.performed += instance.OnHolster;
+                @Holster.canceled += instance.OnHolster;
             }
 
             private void UnregisterCallbacks(IFiringActions instance)
@@ -434,6 +541,15 @@ namespace Controls
                 @PressFire.started -= instance.OnPressFire;
                 @PressFire.performed -= instance.OnPressFire;
                 @PressFire.canceled -= instance.OnPressFire;
+                @ChooseOne.started -= instance.OnChooseOne;
+                @ChooseOne.performed -= instance.OnChooseOne;
+                @ChooseOne.canceled -= instance.OnChooseOne;
+                @ChooseTwo.started -= instance.OnChooseTwo;
+                @ChooseTwo.performed -= instance.OnChooseTwo;
+                @ChooseTwo.canceled -= instance.OnChooseTwo;
+                @Holster.started -= instance.OnHolster;
+                @Holster.performed -= instance.OnHolster;
+                @Holster.canceled -= instance.OnHolster;
             }
 
             public void RemoveCallbacks(IFiringActions instance)
@@ -467,11 +583,15 @@ namespace Controls
             void OnJump(InputAction.CallbackContext context);
             void OnRun(InputAction.CallbackContext context);
             void OnCrouch(InputAction.CallbackContext context);
+            void OnMousePos(InputAction.CallbackContext context);
         }
         public interface IFiringActions
         {
             void OnHoldFire(InputAction.CallbackContext context);
             void OnPressFire(InputAction.CallbackContext context);
+            void OnChooseOne(InputAction.CallbackContext context);
+            void OnChooseTwo(InputAction.CallbackContext context);
+            void OnHolster(InputAction.CallbackContext context);
         }
     }
 }

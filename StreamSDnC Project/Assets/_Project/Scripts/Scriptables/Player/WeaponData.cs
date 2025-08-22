@@ -43,8 +43,7 @@ namespace Player{
         public float chargeTime;
         public float fireRate;
         public float burstRate;
-        public ushort burstCount;
-        // charge attenuation
+        public int burstCount;
 
         public float damage;
 
@@ -52,5 +51,10 @@ namespace Player{
         public int clipSize;
 
         public Vector2[] recoil;
+
+        public float weightMultiplier;
+
+        //Charge attenuation
+        //Range attenuation
     }
 }
