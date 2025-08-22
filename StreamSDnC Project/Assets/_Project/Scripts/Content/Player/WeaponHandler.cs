@@ -3,11 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Player{
+namespace Player.Weapons{
     public class WeaponHandler
     {
+        const float timecheck = -526278;
         public enum HoldState { None = 0, Main = 1, Side = 2}
-        HoldState _holdState = HoldState.None;
+        public HoldState _holdState { get; private set; } = HoldState.None;
 
         Weapon mainWeapon;
         Weapon sideWeapon;
@@ -71,17 +72,33 @@ namespace Player{
                 }
             }
         }
+
+        public Task ShootWeapon(float timestamp = timecheck)
+        {
+            if(timestamp != timecheck) GetCurrentWeapon().chargeTimeStamp = timestamp;
+            return GetCurrentWeapon().BurstCoroutine();
+        }
+
     }
 
     public class Weapon
     {
         public WeaponData data { get; private set; }
         public int currentAmmo { get; private set; } = 0;
-
         public int carriedAmmo { get; private set; } = 0;
-        public Weapon(WeaponData weaponData)
+
+        WeaponGameData gameData => data.GameData;
+
+        bool firedOnce;
+
+        internal float chargeTimeStamp;
+
+        WeaponHandler wh;
+
+        public Weapon(WeaponData weaponData, WeaponHandler Parent)
         {
             data = weaponData;
+            wh = Parent;
         }
 
         public void SetData(WeaponData weaponData)
@@ -89,7 +106,7 @@ namespace Player{
             data = weaponData;
         }
 
-        public void Reload()
+        void Reload()
         {
             int ammoNeeded = data.GameData.clipSize - currentAmmo;
             if (carriedAmmo >= ammoNeeded)
@@ -98,6 +115,34 @@ namespace Player{
                 currentAmmo += ammoToReload;
                 carriedAmmo -= ammoToReload;
             }
+        }
+
+        void TryShoot()
+        {
+            if (currentAmmo > 0)
+            {
+                wh.Shoot(Time.time - chargeTimeStamp, this);
+            }
+            else if (carriedAmmo > 0 && !firedOnce)
+            {
+                Reload();
+            }
+            else
+            {
+                // do stuff
+            }
+        }
+
+        public async Task BurstCoroutine()
+        {
+            for (int i = 0; i < gameData.burstCount; i++)                        //Repetively call Shoot() every `time` seconds
+            {
+                TryShoot();
+                firedOnce = true;
+                await CoroutineRunner.Instance.DelayScaled(gameData.burstRate);
+            }
+            await CoroutineRunner.Instance.DelayScaled(gameData.fireRate);      //Wait additional `delay` time
+            firedOnce = false;
         }
     }
 }

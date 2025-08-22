@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Player.Weapons;
 
 namespace Player{
 public enum StateEnum
@@ -47,18 +48,15 @@ public enum StateEnum
 
         #region WeaponFields
 
-        Weapon _currentWeapon;
-
         bool isSemiFiring;
         bool isAutoFiring;
         bool chargeFired;
-        bool firedOnce;
 
         Task _burstTask;
         float chargeTimeStamp;
+        WeaponHandler.HoldState lastWeapon = WeaponHandler.HoldState.None;
 
-        FireMode _fireMode => _currentWeapon.data.GameData.fireMode;
-        WeaponGameData _weaponData => _currentWeapon.data.GameData;
+        FireMode _fireMode(PlayerContext ctx) => ctx.wh.GetCurrentWeapon().data.GameData.fireMode;
 
         #endregion
         public MainState(PlayerController controller)
@@ -82,6 +80,8 @@ public enum StateEnum
                 isAutoFiring = true;
                 chargeTimeStamp = Time.time;
             };
+
+            InputManager.Instance.WeaponChanged += state => Choose(state, ctx);
         }
         
         public void Exit(ITransition<StateEnum> via, PlayerContext ctx) 
@@ -95,6 +95,8 @@ public enum StateEnum
                 isAutoFiring = true;
                 chargeTimeStamp = Time.time;
             };
+
+            InputManager.Instance.WeaponChanged -= state => Choose(state, ctx);
         }
 
         #region Methods
@@ -144,68 +146,37 @@ public enum StateEnum
         {
             if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
             ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
-            _currentWeapon = ctx.wh.GetCurrentWeapon();
+            lastWeapon = ctx.wh._holdState;
         }
 
         void HandleFire(PlayerContext ctx)
         {
-            if (_fireMode != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
-            if (_currentWeapon == null) return;
+            if (_fireMode(ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
+            if (ctx.wh.GetCurrentWeapon() == null) return;
 
             if(_burstTask == null || _burstTask.IsCompleted) {
-                if (_fireMode == FireMode.SemiAuto)
+                if (_fireMode(ctx) == FireMode.SemiAuto)
                 {
                     if (isSemiFiring)
                     {
-                        _burstTask = BurstCoroutine(_weaponData.burstCount,
-                            _weaponData.burstRate, _weaponData.fireRate, ctx);
+                        isSemiFiring = false;
+                        _burstTask = ctx.wh.ShootWeapon();
                     }
-                } else if(_fireMode == FireMode.Auto)
+                } else if(_fireMode(ctx) == FireMode.Auto)
                 {
                     if(isAutoFiring)
                     {
-                        _burstTask = BurstCoroutine(_weaponData.burstCount,
-                            _weaponData.burstRate, _weaponData.fireRate, ctx);
+                        _burstTask = ctx.wh.ShootWeapon();
                     }
-                } else if(_fireMode == FireMode.Charged)
+                } else if(_fireMode(ctx) == FireMode.Charged)
                 {
                     if (!chargeFired && !isAutoFiring)
                     {
                         chargeFired = true;
-                        _burstTask = BurstCoroutine(_weaponData.burstCount,
-                            _weaponData.burstRate, _weaponData.fireRate, ctx);
+                        _burstTask = ctx.wh.ShootWeapon(chargeTimeStamp);
                     }
                 }
             }
-        }
-
-        void Shoot(PlayerContext ctx)
-        {
-            if (_currentWeapon.currentAmmo > 0)
-            {
-                ctx.wh.Shoot(Time.time - chargeTimeStamp, _currentWeapon);
-            }
-            else if (_currentWeapon.carriedAmmo > 0 && !firedOnce)
-            {
-                _currentWeapon.Reload();
-            }
-            else
-            {
-                // do stuff
-            }
-        }
-
-        async Task BurstCoroutine(int amount, float time, float delay, PlayerContext ctx)
-        {
-            isSemiFiring = false;
-            for(int i  = 0; i < amount; i++)                        //Repetively call Shoot() every `time` seconds
-            {
-                Shoot(ctx);
-                firedOnce = true;
-                await CoroutineRunner.Instance.DelayScaled(time);
-            }
-            await CoroutineRunner.Instance.DelayScaled(delay);      //Wait additional `delay` time
-            firedOnce = false;
         }
         #endregion
     }

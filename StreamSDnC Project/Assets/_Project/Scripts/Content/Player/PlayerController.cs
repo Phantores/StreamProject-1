@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Player.Weapons;
 
 namespace Player{
     public sealed class PlayerContext
