@@ -14,7 +14,18 @@ public class CoroutineRunner : Singleton<CoroutineRunner>
     Task DelayInternal(float seconds, bool useUnscaled, CancellationToken ct)
     {
         var tcs = new TaskCompletionSource<bool>();
-        StartCoroutine(DelayRoutine(seconds, useUnscaled, ct, tcs));
+        var routine = DelayRoutine(seconds, useUnscaled, ct, tcs);
+        var handle = StartCoroutine(routine);
+
+        if(ct.CanBeCanceled)
+        {
+            ct.Register(() =>
+            {
+                if (handle != null) StopCoroutine(handle);
+                tcs.TrySetCanceled(ct);
+            });
+        }
+
         return tcs.Task;
     }
 

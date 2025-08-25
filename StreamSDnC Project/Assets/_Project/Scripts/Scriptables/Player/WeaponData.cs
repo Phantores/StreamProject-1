@@ -1,7 +1,7 @@
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace Player{
+namespace Player.Weapons{
 
     public enum FireMode
     {
@@ -32,8 +32,8 @@ namespace Player{
     [System.Serializable]
     public class WeaponViewData
     {
-        GameObject prefab;
-        AnimatorController animatorController;
+        [field: SerializeField] public ModelController prefab {  get; private set; }
+        [field: SerializeField] public AnimatorController animatorController;
     }
     [System.Serializable]
     public struct WeaponGameData
@@ -49,6 +49,9 @@ namespace Player{
 
         public int maxAmmo;
         public int clipSize;
+
+        public int? reloadPortion; //if null then reload all at once
+        public float reloadTime;
 
         public Vector2[] recoil;
 

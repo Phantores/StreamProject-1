@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 public class GameManager : Singleton<GameManager>
 {
@@ -17,17 +18,14 @@ public class GameManager : Singleton<GameManager>
 
     public void SetState(string state)
     {
-        switch(state)
+        if (Enum.TryParse<GameState>(state, ignoreCase: true, out var parsed))
         {
-            case "MainMenu": State = GameState.MainMenu; break;
-            case "InGame": State = GameState.InGame; break;
-            case "Cutscene": State = GameState.Cutscene; break;
-            case "Pause": State = GameState.Pause; break;
-            case "Loading": State = GameState.Loading; break;
-            default: 
-                throw new WrongStringExcpetion();
+            SetState(parsed);
+            return;
         }
+
+        throw new ArgumentException(
+            $"Unknown state '{state}'. Allowed: {string.Join(", ", Enum.GetNames(typeof(GameState)))}",
+            nameof(state));
     }
 }
-
-public class WrongStringExcpetion : System.Exception{}

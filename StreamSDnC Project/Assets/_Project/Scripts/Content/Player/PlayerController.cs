@@ -8,20 +8,22 @@ namespace Player{
         public readonly Transform Transform;
         public readonly MonoBehaviour Runner;
         public readonly CameraController Camera;
+        public readonly WeaponCenter WeaponCenter;
         public PlayerData Data { get; private set; }
 
         public WeaponHandler wh { get; private set; } = null;
 
         //
 
-        public PlayerContext(Transform t, MonoBehaviour runner, PlayerData data, CameraController camera)
+        public PlayerContext(Transform t, MonoBehaviour runner, PlayerData data, CameraController camera, WeaponCenter weaponCenter)
         {
             Transform = t;
             Runner = runner;
             Data = data;
             Camera = camera;
 
-            wh = new WeaponHandler(camera);
+            wh = new WeaponHandler(camera, weaponCenter);
+            WeaponCenter = weaponCenter;
         }
 
         public void UpdateData(PlayerData data)
@@ -48,6 +50,7 @@ namespace Player{
         PlayerContext ctx;
 
         [SerializeField] CameraController PlayerCamera;
+        [SerializeField] WeaponCenter WeaponCenter;
 
         [field: SerializeField] public PlayerData data { get; private set; }
 
@@ -67,7 +70,7 @@ namespace Player{
                 PlayerCamera.SetData(data.mouseSensitivity, data.viewLimit, this.gameObject);
             }
             cc = GetComponent<CharacterController>();
-            ctx = new PlayerContext(transform, this, data, PlayerCamera);
+            ctx = new PlayerContext(transform, this, data, PlayerCamera, WeaponCenter);
             sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
             {
                 new OffState(this), new MainState(this),

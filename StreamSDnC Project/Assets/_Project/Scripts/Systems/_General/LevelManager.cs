@@ -1,3 +1,4 @@
+using System;
 using Player;
 using UnityEngine.SceneManagement;
 
@@ -40,16 +41,17 @@ public class LevelManager : Singleton<LevelManager>
                     flag = LoadMode.ToGame;
                     break;
             }
+
+            SceneManager.LoadScene(scene.name);
         }
-        catch (WrongStringExcpetion e)
+        catch (ArgumentException e)
         {
             UnityEngine.Debug.LogError("Wrong string exception: " + e.Message);
             return;
-        } finally
-        {
-            SceneManager.LoadScene(scene.name);
         }
+
     }
+
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         try
@@ -67,7 +69,7 @@ public class LevelManager : Singleton<LevelManager>
                     break;
             }
         }
-        catch (WrongStringExcpetion e)
+        catch (ArgumentException e)
         {
             UnityEngine.Debug.LogError("Wrong string exception: " + e.Message);
             return;

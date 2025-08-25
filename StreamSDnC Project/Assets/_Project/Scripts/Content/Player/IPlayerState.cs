@@ -53,6 +53,10 @@ public enum StateEnum
         bool chargeFired;
 
         Task _burstTask;
+        Task _reloadTask;
+
+        CancellationTokenSource _reloadCts;
+
         float chargeTimeStamp;
         WeaponHandler.HoldState lastWeapon = WeaponHandler.HoldState.None;
 
@@ -69,13 +73,14 @@ public enum StateEnum
             Move(dt, ctx);
             HandleFire(ctx);
         }
-        public void Enter(ITransition<StateEnum> via, PlayerContext ctx) 
+        public void Enter(ITransition<StateEnum> via, PlayerContext ctx) //fix these lambdas
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
             InputManager.Instance.OnFirePressed += () => isSemiFiring = true;
             InputManager.Instance.OnHoldChanged += state => {
+                if (ctx.wh.Reloading) return;
                 if(chargeFired) chargeFired = false;
                 isAutoFiring = true;
                 chargeTimeStamp = Time.time;
@@ -144,6 +149,8 @@ public enum StateEnum
 
         void Choose(int index, PlayerContext ctx)
         {
+            _reloadCts?.Cancel(); _reloadCts.Dispose(); _reloadCts = null;
+            //if (ctx.wh.Reloading) return;
             if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
             ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
             lastWeapon = ctx.wh._holdState;
@@ -176,6 +183,17 @@ public enum StateEnum
                         _burstTask = ctx.wh.ShootWeapon(chargeTimeStamp);
                     }
                 }
+            }
+        }
+
+        void HandleReload(PlayerContext ctx)
+        {
+            if(!ctx.wh.Reloading)
+            {
+
+            } else
+            {
+
             }
         }
         #endregion
