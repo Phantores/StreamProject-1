@@ -245,6 +245,15 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Reload"",
+                    ""type"": ""Button"",
+                    ""id"": ""452ea368-b0ed-4806-8b1c-42a604c193ee"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""SlowTap"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -302,6 +311,17 @@ namespace Controls
                     ""action"": ""Holster"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e0da3450-5046-40f7-b7da-511df1632e02"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -340,6 +360,7 @@ namespace Controls
             m_Firing_ChooseOne = m_Firing.FindAction("ChooseOne", throwIfNotFound: true);
             m_Firing_ChooseTwo = m_Firing.FindAction("ChooseTwo", throwIfNotFound: true);
             m_Firing_Holster = m_Firing.FindAction("Holster", throwIfNotFound: true);
+            m_Firing_Reload = m_Firing.FindAction("Reload", throwIfNotFound: true);
         }
 
         ~@IAStandardPlayer()
@@ -498,6 +519,7 @@ namespace Controls
         private readonly InputAction m_Firing_ChooseOne;
         private readonly InputAction m_Firing_ChooseTwo;
         private readonly InputAction m_Firing_Holster;
+        private readonly InputAction m_Firing_Reload;
         public struct FiringActions
         {
             private @IAStandardPlayer m_Wrapper;
@@ -507,6 +529,7 @@ namespace Controls
             public InputAction @ChooseOne => m_Wrapper.m_Firing_ChooseOne;
             public InputAction @ChooseTwo => m_Wrapper.m_Firing_ChooseTwo;
             public InputAction @Holster => m_Wrapper.m_Firing_Holster;
+            public InputAction @Reload => m_Wrapper.m_Firing_Reload;
             public InputActionMap Get() { return m_Wrapper.m_Firing; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -531,6 +554,9 @@ namespace Controls
                 @Holster.started += instance.OnHolster;
                 @Holster.performed += instance.OnHolster;
                 @Holster.canceled += instance.OnHolster;
+                @Reload.started += instance.OnReload;
+                @Reload.performed += instance.OnReload;
+                @Reload.canceled += instance.OnReload;
             }
 
             private void UnregisterCallbacks(IFiringActions instance)
@@ -550,6 +576,9 @@ namespace Controls
                 @Holster.started -= instance.OnHolster;
                 @Holster.performed -= instance.OnHolster;
                 @Holster.canceled -= instance.OnHolster;
+                @Reload.started -= instance.OnReload;
+                @Reload.performed -= instance.OnReload;
+                @Reload.canceled -= instance.OnReload;
             }
 
             public void RemoveCallbacks(IFiringActions instance)
@@ -592,6 +621,7 @@ namespace Controls
             void OnChooseOne(InputAction.CallbackContext context);
             void OnChooseTwo(InputAction.CallbackContext context);
             void OnHolster(InputAction.CallbackContext context);
+            void OnReload(InputAction.CallbackContext context);
         }
     }
 }

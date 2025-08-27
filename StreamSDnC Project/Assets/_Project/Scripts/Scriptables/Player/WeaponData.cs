@@ -36,7 +36,7 @@ namespace Player.Weapons{
         [field: SerializeField] public AnimatorController animatorController;
     }
     [System.Serializable]
-    public struct WeaponGameData
+    public class WeaponGameData
     {
         public FireMode fireMode;
 
@@ -50,12 +50,16 @@ namespace Player.Weapons{
         public int maxAmmo;
         public int clipSize;
 
-        public int? reloadPortion; //if null then reload all at once
+        [SerializeField] public NullableInt reloadPortion; //if null then reload all at once
         public float reloadTime;
 
         public Vector2[] recoil;
 
         public float weightMultiplier;
+
+        public AnimationCurve chargeAttenuation = AnimationCurve.Constant(0, 1, 1);
+        public AnimationCurve reloadAttenuation = AnimationCurve.Linear(0, 0, 1, 1);
+        public AnimationCurve rangeAttenuation = AnimationCurve.Constant(0, 1, 1);
 
         //Charge attenuation
         //Range attenuation

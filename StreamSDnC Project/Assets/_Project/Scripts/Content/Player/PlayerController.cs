@@ -73,7 +73,7 @@ namespace Player{
             ctx = new PlayerContext(transform, this, data, PlayerCamera, WeaponCenter);
             sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
             {
-                new OffState(this), new MainState(this),
+                new OffState(this), new MainState(this, this.ctx),
             });
         }
 

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d415db0ffbb893a49b2ff4456af4e901, type: 3}
+  m_Name: John
+  m_EditorClassIdentifier: 
+  <Name>k__BackingField: J.o.h.n.
+  viewData:
+    <prefab>k__BackingField: {fileID: 3198315001832771829, guid: cfe1350b1d4f3114bad0b4e4ecf1fb9d, type: 3}
+    animatorController: {fileID: 0}
+  gameData:
+    fireMode: 0
+    chargeTime: 0
+    fireRate: 0.2
+    burstRate: 0
+    burstCount: 1
+    damage: 15
+    maxAmmo: 120
+    clipSize: 10
+    reloadPortion:
+      HasValue: 0
+      Value: 0
+    reloadTime: 2
+    recoil:
+    - {x: 0.6, y: 0.55}
+    - {x: -0.23, y: 0.32}
+    - {x: 0.22, y: 0.51}
+    - {x: -0.09, y: 0.33}
+    - {x: 0.2, y: 0.5}
+    - {x: -0.09, y: 0.68}
+    - {x: 0.04, y: 0.47}
+    - {x: -0.18, y: 0.39}
+    - {x: 0.35, y: 0.52}
+    - {x: 0.18, y: 0.65}
+    weightMultiplier: 0.95

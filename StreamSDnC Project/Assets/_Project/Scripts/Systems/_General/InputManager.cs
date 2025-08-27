@@ -23,6 +23,8 @@ public class InputManager : Singleton<InputManager>
 
     public event Action<int> WeaponChanged;
 
+    public event Action OnReloadTap;
+
     protected override void Awake()
     {
         base.Awake();
@@ -44,7 +46,7 @@ public class InputManager : Singleton<InputManager>
         standardControls.Main.Crouch.performed += ctx => Crouch = true;
         standardControls.Main.Crouch.canceled += ctx => Crouch = false;
 
-        standardControls.Firing.PressFire.performed += PressFire;
+        standardControls.Firing.PressFire.performed += ctx => TriggerAction(ctx, OnFirePressed);
 
         standardControls.Firing.HoldFire.started += HoldStart;
         standardControls.Firing.HoldFire.canceled += HoldEnd;
@@ -52,6 +54,8 @@ public class InputManager : Singleton<InputManager>
         standardControls.Firing.ChooseOne.performed += ctx => Choose(ctx, 1);
         standardControls.Firing.ChooseTwo.performed += ctx => Choose(ctx, 2);
         standardControls.Firing.Holster.performed += ctx => Choose(ctx, 0);
+
+        standardControls.Firing.Reload.performed += ctx => TriggerAction(ctx, OnReloadTap);
     }
 
     public void Disable()
@@ -81,7 +85,7 @@ public class InputManager : Singleton<InputManager>
         standardControls.Main.Crouch.performed -= ctx => Crouch = true;
         standardControls.Main.Crouch.canceled -= ctx => Crouch = false;
 
-        standardControls.Firing.PressFire.performed -= PressFire;
+        standardControls.Firing.PressFire.performed -= ctx => TriggerAction(ctx, OnFirePressed);
 
         standardControls.Firing.HoldFire.started -= HoldStart;
         standardControls.Firing.HoldFire.canceled -= HoldEnd;
@@ -89,9 +93,11 @@ public class InputManager : Singleton<InputManager>
         standardControls.Firing.ChooseOne.performed -= ctx => Choose(ctx, 1);
         standardControls.Firing.ChooseTwo.performed -= ctx => Choose(ctx, 2);
         standardControls.Firing.Holster.performed -= ctx => Choose(ctx, 0);
+
+        standardControls.Firing.Reload.performed -= ctx => TriggerAction(ctx, OnReloadTap);
     }
 
-    void PressFire(InputAction.CallbackContext ctx) { OnFirePressed?.Invoke(); }
+    void TriggerAction(InputAction.CallbackContext ctx, Action action) { action?.Invoke(); }
     void HoldStart(InputAction.CallbackContext ctx)
     {
         IsHoldingFire = true;

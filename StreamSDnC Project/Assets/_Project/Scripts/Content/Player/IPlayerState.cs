@@ -37,6 +37,8 @@ public enum StateEnum
         public StateEnum Id => StateEnum.Main;
 
         PlayerController _controller;
+        PlayerContext _ctx;
+
         #region MovementFields
 
         Vector3 _motionVector = Vector3.zero;
@@ -63,30 +65,29 @@ public enum StateEnum
         FireMode _fireMode(PlayerContext ctx) => ctx.wh.GetCurrentWeapon().data.GameData.fireMode;
 
         #endregion
-        public MainState(PlayerController controller)
+
+        public MainState(PlayerController controller, PlayerContext context)
         {
             _controller = controller;
+            _ctx = context;
         }
 
         public void SubUpdate(float dt, PlayerContext ctx) 
         {
-            Move(dt, ctx);
-            HandleFire(ctx);
+            Move(dt);
+            HandleFire();
         }
-        public void Enter(ITransition<StateEnum> via, PlayerContext ctx) //fix these lambdas
+        public void Enter(ITransition<StateEnum> via, PlayerContext ctx)
         {
+            _ctx = ctx;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            InputManager.Instance.OnFirePressed += () => isSemiFiring = true;
-            InputManager.Instance.OnHoldChanged += state => {
-                if (ctx.wh.Reloading) return;
-                if(chargeFired) chargeFired = false;
-                isAutoFiring = true;
-                chargeTimeStamp = Time.time;
-            };
+            InputManager.Instance.OnFirePressed += SetSemiFire;
+            InputManager.Instance.OnHoldChanged += OnHoldChanged;
 
-            InputManager.Instance.WeaponChanged += state => Choose(state, ctx);
+            InputManager.Instance.WeaponChanged += OnWeaponChanged;
+            InputManager.Instance.OnReloadTap += OnReloadTap;
         }
         
         public void Exit(ITransition<StateEnum> via, PlayerContext ctx) 
@@ -94,18 +95,38 @@ public enum StateEnum
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            InputManager.Instance.OnFirePressed -= () => isSemiFiring = true;
-            InputManager.Instance.OnHoldChanged -= state => {
-                if (chargeFired) chargeFired = false;
-                isAutoFiring = true;
-                chargeTimeStamp = Time.time;
-            };
+            InputManager.Instance.OnFirePressed -= SetSemiFire;
+            InputManager.Instance.OnHoldChanged -= OnHoldChanged;
 
-            InputManager.Instance.WeaponChanged -= state => Choose(state, ctx);
+            InputManager.Instance.WeaponChanged -= OnWeaponChanged;
+            InputManager.Instance.OnReloadTap -= OnReloadTap;
         }
+        #region Lambdas
+        void OnFirePressed() => SetSemiFire();
+        void OnHoldChanged(bool state) => HoldChanged(state);
+        void OnWeaponChanged(int index) => Choose(index);
+        void OnReloadTap() => HandleReload();
+
+        void SetSemiFire() { isSemiFiring = true; }
+        void HoldChanged(bool state)
+        {
+            if (_ctx.wh.Reloading) return;
+            if (chargeFired) chargeFired = false;
+            isAutoFiring = true;
+            chargeTimeStamp = Time.time;
+        }
+        void Choose(int index)
+        {
+            _reloadCts?.Cancel(); _reloadCts.Dispose(); _reloadCts = null;
+            //if (ctx.wh.Reloading) return;
+            if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
+            _ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
+            lastWeapon = _ctx.wh._holdState;
+        }
+        #endregion
 
         #region Methods
-        void Move(float dt, PlayerContext ctx)
+        void Move(float dt)
         {
             //_controller.cc.Move(Vector3.zero); // Later velocity checks are not updated - you can yeet into a wall
 
@@ -115,20 +136,20 @@ public enum StateEnum
 
             // Transform motion vector
 
-            _motionVector = Rotation() * _motionVector * ctx.Data.moveSpeed;
+            _motionVector = Rotation() * _motionVector * _ctx.Data.moveSpeed;
 
             if (InputManager.Instance.Run)
             {
-                _motionVector *= ctx.Data.runMult;
+                _motionVector *= _ctx.Data.runMult;
             }
             else if (InputManager.Instance.Crouch)
             {
-                _motionVector *= ctx.Data.crouchMult;
+                _motionVector *= _ctx.Data.crouchMult;
             }
 
             if (InputManager.Instance.Jump && _controller.cc.isGrounded)
             {
-                gravity = ctx.Data.jumpForce;
+                gravity = _ctx.Data.jumpForce;
             }
             else if (_controller.cc.isGrounded)
             {
@@ -140,60 +161,50 @@ public enum StateEnum
             }
 
             _motionVector.y = gravity;
-            _motionVector.y = Mathf.Clamp(_motionVector.y, -ctx.Data.terminalVelocity, ctx.Data.terminalVelocity);
+            _motionVector.y = Mathf.Clamp(_motionVector.y, -_ctx.Data.terminalVelocity, _ctx.Data.terminalVelocity);
 
             // Execute motion
             _controller.cc.Move(_motionVector * dt);
-            ctx.Camera.PassRotation(InputManager.Instance.Mouse);
+            _ctx.Camera.PassRotation(InputManager.Instance.Mouse);
         }
-
-        void Choose(int index, PlayerContext ctx)
+        void HandleFire()
         {
-            _reloadCts?.Cancel(); _reloadCts.Dispose(); _reloadCts = null;
-            //if (ctx.wh.Reloading) return;
-            if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
-            ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
-            lastWeapon = ctx.wh._holdState;
-        }
+            if (_fireMode(_ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
+            if (_ctx.wh.GetCurrentWeapon() == null) return;
 
-        void HandleFire(PlayerContext ctx)
-        {
-            if (_fireMode(ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
-            if (ctx.wh.GetCurrentWeapon() == null) return;
-
-            if(_burstTask == null || _burstTask.IsCompleted) {
-                if (_fireMode(ctx) == FireMode.SemiAuto)
+            if(_burstTask == null || _burstTask.IsCompleted && _reloadTask == null || _reloadTask.IsCompleted) {
+                if (_fireMode(_ctx) == FireMode.SemiAuto)
                 {
                     if (isSemiFiring)
                     {
                         isSemiFiring = false;
-                        _burstTask = ctx.wh.ShootWeapon();
+                        _burstTask = _ctx.wh.ShootWeapon();
                     }
-                } else if(_fireMode(ctx) == FireMode.Auto)
+                } else if(_fireMode(_ctx) == FireMode.Auto)
                 {
                     if(isAutoFiring)
                     {
-                        _burstTask = ctx.wh.ShootWeapon();
+                        _burstTask = _ctx.wh.ShootWeapon();
                     }
-                } else if(_fireMode(ctx) == FireMode.Charged)
+                } else if(_fireMode(_ctx) == FireMode.Charged)
                 {
                     if (!chargeFired && !isAutoFiring)
                     {
                         chargeFired = true;
-                        _burstTask = ctx.wh.ShootWeapon(chargeTimeStamp);
+                        _burstTask = _ctx.wh.ShootWeapon(chargeTimeStamp);
                     }
                 }
             }
         }
 
-        void HandleReload(PlayerContext ctx)
+        void HandleReload()
         {
-            if(!ctx.wh.Reloading)
+            if(!_ctx.wh.Reloading)
             {
-
+                _reloadTask = _ctx.wh.ReloadWeapon(_reloadCts.Token);
             } else
             {
-
+                _reloadCts.Cancel();
             }
         }
         #endregion

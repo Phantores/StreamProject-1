@@ -70,7 +70,7 @@ namespace Player.Weapons{
 
         #region ShootingMethods
 
-        internal void Shoot(float time, Weapon weapon)
+        internal void Shoot(float time, Weapon weapon, Vector2 recoil)
         {
             _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Shooting);
             Ray ray = _cameraCont.Camera.ScreenPointToRay(InputManager.Instance.MousePosition);
@@ -82,6 +82,7 @@ namespace Player.Weapons{
                     hitentity.Damage(weapon.data.GameData.damage);
                 }
             }
+            _cameraCont.PassRotation(recoil);
         }
 
         public Task ShootWeapon(float timestamp = timecheck)
@@ -111,6 +112,7 @@ namespace Player.Weapons{
 
 
         bool firedOnce;
+        bool skipDelay;
         internal float chargeTimeStamp;
 
         WeaponHandler wh;
@@ -128,24 +130,19 @@ namespace Player.Weapons{
             data = weaponData;
         }
 
-        void Reload() // this needs to be changed
+        void Reload()
         {
-            if (gameData.reloadPortion == null)
-            {
-                int ammoNeeded = data.GameData.clipSize - currentAmmo;
-                if (carriedAmmo >= ammoNeeded)
-                {
-                    int ammoToReload = carriedAmmo % ammoNeeded;
-                    currentAmmo += ammoToReload;
-                    carriedAmmo -= ammoToReload;
-                }
-            } else
-            {
-                
-            }
+            int space = Math.Max(0, gameData.clipSize - currentAmmo);
+            int portion = gameData.reloadPortion.HasValue ? gameData.reloadPortion.Value : space;
+            int toLoad = Math.Min(space, Math.Min(portion, carriedAmmo));
+
+            if (toLoad < 0) toLoad = 0;
+
+            carriedAmmo += toLoad;
+            currentAmmo -= toLoad;
         }
 
-        bool ReloadEval()
+        bool ReloadEval() // make sure is complete
         {
             if (carriedAmmo == 0) return false;
             if (currentAmmo == gameData.maxAmmo) return false;
@@ -154,32 +151,40 @@ namespace Player.Weapons{
             return true;
         }
 
-        void TryShoot()
+        bool TryShoot()
         {
             if (currentAmmo > 0)
             {
                 currentAmmo--;
-                wh.Shoot(Time.time - chargeTimeStamp, this);
+                wh.Shoot(Time.time - chargeTimeStamp, this, gameData.recoil[currentAmmo]);
+                return true;
             }
             else if (carriedAmmo > 0 && !firedOnce)
             {
-                Reload();
+                return false;
+            }
+            else if(!firedOnce)
+            {
+                // do stuff for pause mid fire
+                return false;
             }
             else
             {
-                // do stuff
+                // do stuff for empty gun
+                return false;
             }
         }
 
         public async Task BurstCoroutine()
         {
-            for (int i = 0; i < gameData.burstCount; i++)                        //Repetively call Shoot() every `time` seconds
+            skipDelay = false;
+            for (int i = 0; i < gameData.burstCount; i++)
             {
-                TryShoot();
+                if (!TryShoot()) { skipDelay = true; break;}
                 firedOnce = true;
                 await CoroutineRunner.Instance.DelayScaled(gameData.burstRate);
             }
-            await CoroutineRunner.Instance.DelayScaled(gameData.fireRate - gameData.burstRate);      //Wait additional `delay` time
+            if(!skipDelay) await CoroutineRunner.Instance.DelayScaled(gameData.fireRate - gameData.burstRate);
             firedOnce = false;
         }
 
@@ -190,10 +195,10 @@ namespace Player.Weapons{
 
             try
             {
-                if(gameData.reloadPortion == null)
+                if(gameData.reloadPortion == null && ReloadEval())
                 {
-                    await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime);
-                    if (_softReloadCancel) return;
+                    await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime * gameData.reloadAttenuation.Evaluate(currentAmmo / gameData.clipSize));
+                    // if (_softReloadCancel) return;
                     Reload();
                 }
                 else
@@ -203,7 +208,7 @@ namespace Player.Weapons{
                         if (_softReloadCancel) break;
                         ct.ThrowIfCancellationRequested();
 
-                        await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime, ct);
+                        await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime);
 
                         if (_softReloadCancel) break;
                         if(ct.IsCancellationRequested) ct.ThrowIfCancellationRequested();
