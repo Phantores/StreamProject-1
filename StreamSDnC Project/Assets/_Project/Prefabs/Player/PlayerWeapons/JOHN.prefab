@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 623530851313850446}
   - component: {fileID: 8937716285114913102}
   - component: {fileID: 4916201065071736691}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: JOHN
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,9 +116,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4217067960757889527, guid: 9e19a5d241822174a9ee34e66c0667f5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9e19a5d241822174a9ee34e66c0667f5, type: 3}
       propertyPath: m_Name
       value: 'Gun01 LOD1 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9e19a5d241822174a9ee34e66c0667f5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6619225641134156614, guid: 9e19a5d241822174a9ee34e66c0667f5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8351053838077304830, guid: 9e19a5d241822174a9ee34e66c0667f5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -112,7 +112,7 @@ public class InputManager : Singleton<InputManager>
 
     void Choose(InputAction.CallbackContext ctx, int num)
     {
-        if(num <= 2 && num > 0)
+        if(num <= 2 && num >= 0)
         {
             WeaponChanged?.Invoke(num);
         }

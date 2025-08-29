@@ -6,7 +6,7 @@ namespace Player{
     public sealed class PlayerContext
     {
         public readonly Transform Transform;
-        public readonly MonoBehaviour Runner;
+        public readonly PlayerController Runner;
         public readonly CameraController Camera;
         public readonly WeaponCenter WeaponCenter;
         public PlayerData Data { get; private set; }
@@ -15,14 +15,14 @@ namespace Player{
 
         //
 
-        public PlayerContext(Transform t, MonoBehaviour runner, PlayerData data, CameraController camera, WeaponCenter weaponCenter)
+        public PlayerContext(Transform t, PlayerController runner, PlayerData data, CameraController camera, WeaponCenter weaponCenter)
         {
             Transform = t;
             Runner = runner;
             Data = data;
             Camera = camera;
 
-            wh = new WeaponHandler(camera, weaponCenter);
+            wh = new WeaponHandler(this);
             WeaponCenter = weaponCenter;
         }
 
@@ -52,9 +52,14 @@ namespace Player{
         [SerializeField] CameraController PlayerCamera;
         [SerializeField] WeaponCenter WeaponCenter;
 
+        [field: SerializeField] public UI_Docs.MainHudHandler mainHud { get; private set; }
+
         [field: SerializeField] public PlayerData data { get; private set; }
 
         public CharacterController cc { get; private set; }
+
+        /*temp*/
+        public WeaponData testWeapon;
 
         private void Awake()
         {
@@ -71,15 +76,16 @@ namespace Player{
             }
             cc = GetComponent<CharacterController>();
             ctx = new PlayerContext(transform, this, data, PlayerCamera, WeaponCenter);
-            sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
-            {
-                new OffState(this), new MainState(this, this.ctx),
-            });
         }
 
         private void Start()
         {
             LevelManager.Instance.SetPlayer(this);
+            sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
+            {
+                new OffState(this), new MainState(this, this.ctx),
+            });
+            ctx.wh.SetWeapon(true, testWeapon);
         }
 
         private void Update()

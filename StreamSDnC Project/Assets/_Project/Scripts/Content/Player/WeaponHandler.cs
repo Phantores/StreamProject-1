@@ -15,40 +15,60 @@ namespace Player.Weapons{
         Weapon mainWeapon;
         Weapon sideWeapon;
 
-        CameraController _cameraCont;
-        WeaponCenter _center;
+        public PlayerContext _ctx { get; private set; }
 
-        public WeaponHandler(CameraController camera, WeaponCenter center)
+        CameraController _cameraCont => _ctx.Camera;
+        WeaponCenter _center => _ctx.WeaponCenter;
+
+        public WeaponHandler(PlayerContext ctx)
         {
-            _cameraCont = camera;
-            _center = center;
+            _ctx = ctx;
         }
 
         #region WeaponSetters
 
         public void PickWeapon(HoldState holdState)
         {
-            switch (_holdState)
+            switch (holdState)
             {
                 case HoldState.Main:
-                    if(mainWeapon != null) holdState = HoldState.Main;
+                    if (mainWeapon == null) return;
+                    _holdState = HoldState.Main;
                     _center.ChangeWeapon(mainWeapon);
+                    _ctx.Runner.mainHud.UpdateWeapon(mainWeapon, true, HoldState.Main, true);
                     break;
                 case HoldState.Side:
-                    if (sideWeapon != null) holdState = HoldState.Side;
+                    if (sideWeapon == null) return;
+                    _holdState = HoldState.Side;
                     _center.ChangeWeapon(sideWeapon);
+                    _ctx.Runner.mainHud.UpdateWeapon(sideWeapon, false, HoldState.Side, true);
                     break;
                 default:
-                    holdState = HoldState.None;
+                    _holdState = HoldState.None;
                     _center.DisposeWeapon();
+                    _ctx.Runner.mainHud.UpdateWeapon(mainWeapon, true, HoldState.None, true);
                     break;
             }
         }
 
-        public void SetWeapon(bool main, WeaponData weapon)
+        public void SetWeapon(bool main, WeaponData weaponData)
         {
-            if(main) mainWeapon.SetData(weapon);
-            else sideWeapon.SetData(weapon);
+            Debug.Log($"Changed weapon to {weaponData}");
+            Weapon weapon = main ? mainWeapon : sideWeapon;
+            if (weaponData == null) weapon = null;
+            else if(weapon == null)
+            {
+                weapon = new Weapon(weaponData, this);
+            }
+            else
+            {
+                weapon = null;
+                weapon = new Weapon(weaponData, this);
+            }
+
+            if (main) mainWeapon = weapon;
+            else sideWeapon = weapon;
+            _ctx.Runner.mainHud.UpdateWeapon(weapon, main, _holdState, false, true);
         }
 
         public Weapon GetCurrentWeapon()
@@ -83,6 +103,16 @@ namespace Player.Weapons{
                 }
             }
             _cameraCont.PassRotation(recoil);
+            _ctx.Runner.mainHud.UpdateAmmo(weapon.currentAmmo, weapon.carriedAmmo);
+        }
+
+        internal void Reload(Weapon weapon)
+        {
+            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Reloading);
+        }
+        internal void Cancel()
+        {
+            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Idle);
         }
 
         public Task ShootWeapon(float timestamp = timecheck)
@@ -110,19 +140,20 @@ namespace Player.Weapons{
 
         WeaponGameData gameData => data.GameData;
 
-
         bool firedOnce;
         bool skipDelay;
+        bool _softReloadCancel;
         internal float chargeTimeStamp;
 
         WeaponHandler wh;
-
-        bool _softReloadCancel;
 
         public Weapon(WeaponData weaponData, WeaponHandler Parent)
         {
             data = weaponData;
             wh = Parent;
+
+            currentAmmo = gameData.clipSize;
+            carriedAmmo = gameData.maxAmmo / 2;
         }
 
         public void SetData(WeaponData weaponData)
@@ -140,6 +171,8 @@ namespace Player.Weapons{
 
             carriedAmmo += toLoad;
             currentAmmo -= toLoad;
+
+            wh._ctx.Runner.mainHud.UpdateAmmo(currentAmmo, carriedAmmo);
         }
 
         bool ReloadEval() // make sure is complete
@@ -161,11 +194,7 @@ namespace Player.Weapons{
             }
             else if (carriedAmmo > 0 && !firedOnce)
             {
-                return false;
-            }
-            else if(!firedOnce)
-            {
-                // do stuff for pause mid fire
+                // idk prompt to reload or something
                 return false;
             }
             else
@@ -197,8 +226,13 @@ namespace Player.Weapons{
             {
                 if(gameData.reloadPortion == null && ReloadEval())
                 {
-                    await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime * gameData.reloadAttenuation.Evaluate(currentAmmo / gameData.clipSize));
-                    // if (_softReloadCancel) return;
+                    wh.Reload(this);
+                    await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime * gameData.reloadAttenuation.Evaluate(currentAmmo / gameData.clipSize), ct);
+                    if (_softReloadCancel)
+                    {
+                        wh.Cancel();
+                        return;
+                    }
                     Reload();
                 }
                 else
@@ -208,9 +242,14 @@ namespace Player.Weapons{
                         if (_softReloadCancel) break;
                         ct.ThrowIfCancellationRequested();
 
-                        await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime);
+                        wh.Reload(this);
+                        await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime, ct);
 
-                        if (_softReloadCancel) break;
+                        if (_softReloadCancel)
+                        {
+                            wh.Cancel();
+                            break;
+                        }
                         if(ct.IsCancellationRequested) ct.ThrowIfCancellationRequested();
 
                         Reload();

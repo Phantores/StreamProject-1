@@ -9,19 +9,19 @@ namespace Player.Weapons{
         {
             if(weaponModel != null) Destroy(weaponModel.gameObject);
 
-            weaponModel = Instantiate(newPrefab);
+            weaponModel = Instantiate(newPrefab, this.transform);
         }
 
         public void ChangeWeapon(Weapon newWeapon)
         {
             if (weaponModel != null) Destroy(weaponModel.gameObject);
 
-            weaponModel = Instantiate(newWeapon.data.ViewData.prefab);
+            weaponModel = Instantiate(newWeapon.data.ViewData.prefab, this.transform);
         }
 
         public void DisposeWeapon()
         {
-            Destroy(weaponModel);
+            Destroy(weaponModel.gameObject);
             weaponModel = null;
         }
     }

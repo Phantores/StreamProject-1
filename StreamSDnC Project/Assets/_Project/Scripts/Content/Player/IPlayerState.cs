@@ -83,7 +83,7 @@ public enum StateEnum
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            InputManager.Instance.OnFirePressed += SetSemiFire;
+            InputManager.Instance.OnFirePressed += OnFirePressed;
             InputManager.Instance.OnHoldChanged += OnHoldChanged;
 
             InputManager.Instance.WeaponChanged += OnWeaponChanged;
@@ -101,13 +101,14 @@ public enum StateEnum
             InputManager.Instance.WeaponChanged -= OnWeaponChanged;
             InputManager.Instance.OnReloadTap -= OnReloadTap;
         }
+
         #region Lambdas
         void OnFirePressed() => SetSemiFire();
         void OnHoldChanged(bool state) => HoldChanged(state);
         void OnWeaponChanged(int index) => Choose(index);
         void OnReloadTap() => HandleReload();
 
-        void SetSemiFire() { isSemiFiring = true; }
+        void SetSemiFire() { isSemiFiring = true; Debug.Log("SetFire"); }
         void HoldChanged(bool state)
         {
             if (_ctx.wh.Reloading) return;
@@ -117,11 +118,15 @@ public enum StateEnum
         }
         void Choose(int index)
         {
-            _reloadCts?.Cancel(); _reloadCts.Dispose(); _reloadCts = null;
             //if (ctx.wh.Reloading) return;
             if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
+            if ((WeaponHandler.HoldState)index == _ctx.wh._holdState) return;
+
+            _reloadCts?.Cancel(); _reloadCts?.Dispose(); _reloadCts = null;
+
             _ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
             lastWeapon = _ctx.wh._holdState;
+            Debug.Log($"Changed to {index}");
         }
         #endregion
 
@@ -169,8 +174,8 @@ public enum StateEnum
         }
         void HandleFire()
         {
-            if (_fireMode(_ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
             if (_ctx.wh.GetCurrentWeapon() == null) return;
+            if (_fireMode(_ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
 
             if(_burstTask == null || _burstTask.IsCompleted && _reloadTask == null || _reloadTask.IsCompleted) {
                 if (_fireMode(_ctx) == FireMode.SemiAuto)
@@ -178,6 +183,7 @@ public enum StateEnum
                     if (isSemiFiring)
                     {
                         isSemiFiring = false;
+                        Debug.Log("Fired");
                         _burstTask = _ctx.wh.ShootWeapon();
                     }
                 } else if(_fireMode(_ctx) == FireMode.Auto)
