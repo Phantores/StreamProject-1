@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerCamera: {fileID: 261944920}
-  WeaponCenter: {fileID: 575793532}
+  WeaponCenter: {fileID: 0}
   <mainHud>k__BackingField: {fileID: 905863235}
   <data>k__BackingField: {fileID: 11400000, guid: f251d6eface8f064c9cdc1117d1344e7, type: 2}
   testWeapon: {fileID: 11400000, guid: 5734ea1f38c0dda4b85c5f1885cfa2ed, type: 2}
@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 261944917}
   - component: {fileID: 261944916}
   - component: {fileID: 261944919}
+  - component: {fileID: 261944921}
   - component: {fileID: 261944920}
   m_Layer: 0
   m_Name: Main Camera
@@ -347,6 +348,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41d788c9f200a244ead2c55c116771d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &261944921
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 261944915}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e2e812e32c6e8cb48863b42a20a3e3ac, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &309265850
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,6 +616,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 575793531}
+  - component: {fileID: 575793533}
   - component: {fileID: 575793532}
   m_Layer: 6
   m_Name: GunView
@@ -628,6 +652,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea3abc0c8ff8e3d4a9850c4467530718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &575793533
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 575793530}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1c40cbd9f2e88f84fb6d26d339330a74, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &842781534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1156,6 +1202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _visualTree: {fileID: 9197481963319205126, guid: 07459943d2c6f1f4481a96687ffd9b37, type: 3}
   _styleSheet: {fileID: 7433441132597879392, guid: 7d5833a68e66c6245b8c49c0ec028a2c, type: 3}
+  PickingMode: 1
   selectedColor: {r: 0.22745098, g: 0.28627452, b: 0.34117648, a: 1}
   unselectedColor: {r: 0.32941177, g: 0.32941177, b: 0.32941177, a: 1}
   selectedTextColor: {r: 1, g: 1, b: 1, a: 1}

@@ -15,12 +15,12 @@ MonoBehaviour:
   <Name>k__BackingField: J.o.h.n.
   viewData:
     <prefab>k__BackingField: {fileID: 4916201065071736691, guid: 6a027c474c7268146a97d10c639a0f7c, type: 3}
-    animatorController: {fileID: 0}
+    animatorController: {fileID: 9100000, guid: 362ad8b23f816fd4f95d787f95c0730a, type: 2}
   gameData:
     fireMode: 0
     chargeTime: 0
     fireRate: 0.2
-    burstRate: 0
+    burstRate: 0.001
     burstCount: 1
     damage: 15
     maxAmmo: 120
@@ -30,17 +30,19 @@ MonoBehaviour:
       Value: 0
     reloadTime: 2
     recoil:
-    - {x: 0.6, y: 0.55}
-    - {x: -0.23, y: 0.32}
-    - {x: 0.22, y: 0.51}
-    - {x: -0.09, y: 0.33}
-    - {x: 0.2, y: 0.5}
-    - {x: -0.09, y: 0.68}
-    - {x: 0.04, y: 0.47}
-    - {x: -0.18, y: 0.39}
-    - {x: 0.35, y: 0.52}
-    - {x: 0.18, y: 0.65}
+    - {x: 0.6, y: 1.87}
+    - {x: -0.23, y: 1.69}
+    - {x: 0.22, y: 1.79}
+    - {x: -0.09, y: 1.26}
+    - {x: 0.2, y: 1.61}
+    - {x: -0.09, y: 2.03}
+    - {x: 0.04, y: 1.76}
+    - {x: -0.18, y: 2.4}
+    - {x: 0.35, y: 1.22}
+    - {x: 0.18, y: 2.51}
     weightMultiplier: 0.95
+    aimSpeedMultiplier: 0.8
+    aimTime: 1
     chargeAttenuation:
       serializedVersion: 2
       m_Curve:
@@ -70,19 +72,19 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 1
         inSlope: 0
-        outSlope: 1
-        tangentMode: 0
+        outSlope: 0
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: 1
+        inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0

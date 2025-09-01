@@ -5,6 +5,7 @@ using Player.Weapons;
 namespace UI_Docs{
     public sealed class MainHudHandler : UI_Handler
     {
+        [Space][Header("MainHudHandler")]
         [SerializeField] Color selectedColor;
         [SerializeField] Color unselectedColor;
 
@@ -46,7 +47,7 @@ namespace UI_Docs{
                 if(changeTo == WeaponHandler.HoldState.None)
                     UpdateAmmo();
                 else
-                    UpdateAmmo(weapon.currentAmmo, weapon.carriedAmmo);
+                    UpdateAmmo(weapon.currentAmmo, weapon.reserveAmmo);
             }
         }
 

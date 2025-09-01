@@ -7,8 +7,10 @@ namespace UI_Docs
     {
         protected VisualElement root;
 
+        [Header("Core")]
         [SerializeField] VisualTreeAsset _visualTree;
         [SerializeField] StyleSheet _styleSheet;
+        [SerializeField] PickingMode PickingMode;
 
         protected virtual VisualTreeAsset VisualTree => _visualTree;
         protected virtual StyleSheet StyleSheet => _styleSheet;
@@ -38,6 +40,8 @@ namespace UI_Docs
             {
                 root.styleSheets.Add(StyleSheet);
             }
+
+            root.pickingMode = PickingMode;
 
             InitUI();
         }

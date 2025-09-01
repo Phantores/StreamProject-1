@@ -12,6 +12,7 @@ public enum StateEnum
     public class OffState : IState<StateEnum, PlayerContext>
     {
         public StateEnum Id => StateEnum.Off;
+        public PlayerContext _ctx { get; private set; }
 
         PlayerController _controller;
 
@@ -37,7 +38,7 @@ public enum StateEnum
         public StateEnum Id => StateEnum.Main;
 
         PlayerController _controller;
-        PlayerContext _ctx;
+        public PlayerContext _ctx { get; private set; }
 
         #region MovementFields
 
@@ -45,6 +46,20 @@ public enum StateEnum
         Quaternion Rotation() => _controller.transform.rotation;
 
         float gravity = 0;
+
+        float aimSpeedMultiplier;
+        float weightMultiplier;
+        float adsTime;
+
+        float WeaponHeft(bool allowAim)
+        {
+            if(_ctx.wh.GetCurrentWeapon() != null)
+            {
+                float aimSlow = InputManager.Instance.IsAiming && allowAim ? aimSpeedMultiplier : 1;
+                return weightMultiplier * aimSlow;
+            }
+            return 1f;
+        }
 
         #endregion
 
@@ -95,7 +110,7 @@ public enum StateEnum
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            InputManager.Instance.OnFirePressed -= SetSemiFire;
+            InputManager.Instance.OnFirePressed -= OnFirePressed;
             InputManager.Instance.OnHoldChanged -= OnHoldChanged;
 
             InputManager.Instance.WeaponChanged -= OnWeaponChanged;
@@ -108,7 +123,12 @@ public enum StateEnum
         void OnWeaponChanged(int index) => Choose(index);
         void OnReloadTap() => HandleReload();
 
-        void SetSemiFire() { isSemiFiring = true; Debug.Log("SetFire"); }
+        void SetSemiFire() {
+            if (_ctx.wh.GetCurrentWeapon() == null) return;
+            if (_fireMode(_ctx) == FireMode.SemiAuto) {
+                isSemiFiring = true;
+            }
+        }
         void HoldChanged(bool state)
         {
             if (_ctx.wh.Reloading) return;
@@ -121,12 +141,19 @@ public enum StateEnum
             //if (ctx.wh.Reloading) return;
             if (!System.Enum.IsDefined(typeof(WeaponHandler.HoldState), index)) return;
             if ((WeaponHandler.HoldState)index == _ctx.wh._holdState) return;
+            if (_ctx.wh.IsWeaponNull((WeaponHandler.HoldState)index)) return;
 
             _reloadCts?.Cancel(); _reloadCts?.Dispose(); _reloadCts = null;
 
             _ctx.wh.PickWeapon((WeaponHandler.HoldState)index);
             lastWeapon = _ctx.wh._holdState;
-            Debug.Log($"Changed to {index}");
+
+            if (_ctx.wh.GetCurrentWeapon() != null)
+            {
+                weightMultiplier = _ctx.wh.GetCurrentWeapon().data.GameData.weightMultiplier;
+                aimSpeedMultiplier = _ctx.wh.GetCurrentWeapon().data.GameData.aimSpeedMultiplier;
+                adsTime = _ctx.wh.GetCurrentWeapon().data.GameData.aimTime;
+            }
         }
         #endregion
 
@@ -143,13 +170,17 @@ public enum StateEnum
 
             _motionVector = Rotation() * _motionVector * _ctx.Data.moveSpeed;
 
-            if (InputManager.Instance.Run)
+            if (InputManager.Instance.Run && !InputManager.Instance.IsAiming)
             {
-                _motionVector *= _ctx.Data.runMult;
+                _motionVector *= _ctx.Data.runMult * WeaponHeft(false);
             }
             else if (InputManager.Instance.Crouch)
             {
-                _motionVector *= _ctx.Data.crouchMult;
+                _motionVector *= _ctx.Data.crouchMult * WeaponHeft(false);
+            }
+            else
+            {
+                _motionVector *= WeaponHeft(true);
             }
 
             if (InputManager.Instance.Jump && _controller.cc.isGrounded)
@@ -171,19 +202,22 @@ public enum StateEnum
             // Execute motion
             _controller.cc.Move(_motionVector * dt);
             _ctx.Camera.PassRotation(InputManager.Instance.Mouse);
+            if (_ctx.wh.GetCurrentWeapon() != null) {
+                _ctx.WeaponCenter.Aim(InputManager.Instance.IsAiming);
+                _ctx.Camera.Aim(InputManager.Instance.IsAiming, adsTime); 
+            }
         }
         void HandleFire()
         {
             if (_ctx.wh.GetCurrentWeapon() == null) return;
             if (_fireMode(_ctx) != FireMode.SemiAuto && isSemiFiring) isSemiFiring = false;
 
-            if(_burstTask == null || _burstTask.IsCompleted && _reloadTask == null || _reloadTask.IsCompleted) {
+            if((_burstTask == null || _burstTask.IsCompleted) && (_reloadTask == null || _reloadTask.IsCompleted)) {
                 if (_fireMode(_ctx) == FireMode.SemiAuto)
                 {
                     if (isSemiFiring)
                     {
                         isSemiFiring = false;
-                        Debug.Log("Fired");
                         _burstTask = _ctx.wh.ShootWeapon();
                     }
                 } else if(_fireMode(_ctx) == FireMode.Auto)
@@ -205,12 +239,16 @@ public enum StateEnum
 
         void HandleReload()
         {
-            if(!_ctx.wh.Reloading)
+            if(!_ctx.wh.Reloading && _ctx.wh.GetCurrentWeapon().ReloadEval())
             {
+                _reloadCts?.Dispose();
+                _reloadCts = new CancellationTokenSource();
                 _reloadTask = _ctx.wh.ReloadWeapon(_reloadCts.Token);
             } else
             {
-                _reloadCts.Cancel();
+                _reloadCts?.Cancel();
+                _reloadCts?.Dispose();
+                _reloadCts = null;
             }
         }
         #endregion

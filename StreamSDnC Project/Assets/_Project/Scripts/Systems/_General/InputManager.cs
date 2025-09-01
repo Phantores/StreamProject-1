@@ -16,6 +16,8 @@ public class InputManager : Singleton<InputManager>
     public bool Run { get; private set; }
     public bool Crouch { get; private set; }
 
+    public bool IsAiming { get; private set; }
+
     public bool IsHoldingFire { get; private set; }
 
     public event Action OnFirePressed;
@@ -31,31 +33,34 @@ public class InputManager : Singleton<InputManager>
         standardControls = new IAStandardPlayer();
         standardControls.Enable();
 
-        standardControls.Main.Move.performed += ctx => Move = ctx.ReadValue<Vector2>();
-        standardControls.Main.Move.canceled += ctx => Move = Vector2.zero;
+        standardControls.Main.Move.performed += OnMovePerformed;
+        standardControls.Main.Move.canceled += OnMoveCanceled;
 
-        standardControls.Main.Mouse.performed += ctx => Mouse = ctx.ReadValue<Vector2>();
-        standardControls.Main.Mouse.canceled += ctx => Mouse = Vector2.zero;
+        standardControls.Main.Mouse.performed += OnMousePerformed;
+        standardControls.Main.Mouse.canceled += OnMouseCanceled;
 
-        standardControls.Main.Jump.performed += ctx => Jump = true;
-        standardControls.Main.Jump.canceled += ctx => Jump = false;
+        standardControls.Main.Jump.performed += OnJumpPerformed;
+        standardControls.Main.Jump.canceled += OnJumpCanceled;
 
-        standardControls.Main.Run.performed += ctx => Run = true;
-        standardControls.Main.Run.canceled += ctx => Run = false;
+        standardControls.Main.Run.performed += OnRunPerformed;
+        standardControls.Main.Run.canceled += OnRunCanceled;
 
-        standardControls.Main.Crouch.performed += ctx => Crouch = true;
-        standardControls.Main.Crouch.canceled += ctx => Crouch = false;
+        standardControls.Main.Crouch.performed += OnCrouchPerformed;
+        standardControls.Main.Crouch.canceled += OnCrouchCanceled;
 
-        standardControls.Firing.PressFire.performed += ctx => TriggerAction(ctx, OnFirePressed);
+        standardControls.Firing.Aim.performed += OnAimPerformed;
+        standardControls.Firing.Aim.canceled += OnAimCanceled;
+
+        standardControls.Firing.PressFire.performed += OnPressFirePerformed;
 
         standardControls.Firing.HoldFire.started += HoldStart;
         standardControls.Firing.HoldFire.canceled += HoldEnd;
 
-        standardControls.Firing.ChooseOne.performed += ctx => Choose(ctx, 1);
-        standardControls.Firing.ChooseTwo.performed += ctx => Choose(ctx, 2);
-        standardControls.Firing.Holster.performed += ctx => Choose(ctx, 0);
+        standardControls.Firing.ChooseOne.performed += OnChooseOnePerformed;
+        standardControls.Firing.ChooseTwo.performed += OnChooseTwoPerformed;
+        standardControls.Firing.Holster.performed += OnHolsterPerformed;
 
-        standardControls.Firing.Reload.performed += ctx => TriggerAction(ctx, OnReloadTap);
+        standardControls.Firing.Reload.performed += OnReloadPerformed;
     }
 
     public void Disable()
@@ -70,32 +75,65 @@ public class InputManager : Singleton<InputManager>
 
     public void OnDisable()
     {
-        standardControls.Main.Move.performed -= ctx => Move = ctx.ReadValue<Vector2>();
-        standardControls.Main.Move.canceled -= ctx => Move = Vector2.zero;
+        standardControls.Main.Move.performed -= OnMovePerformed;
+        standardControls.Main.Move.canceled -= OnMoveCanceled;
 
-        standardControls.Main.Mouse.performed -= ctx => Mouse = ctx.ReadValue<Vector2>();
-        standardControls.Main.Mouse.canceled -= ctx => Mouse = Vector2.zero;
+        standardControls.Main.Mouse.performed -= OnMousePerformed;
+        standardControls.Main.Mouse.canceled -= OnMouseCanceled;
 
-        standardControls.Main.Jump.performed -= ctx => Jump = true;
-        standardControls.Main.Jump.canceled -= ctx => Jump = false;
+        standardControls.Main.Jump.performed -= OnJumpPerformed;
+        standardControls.Main.Jump.canceled -= OnJumpCanceled;
 
-        standardControls.Main.Run.performed -= ctx => Run = true;
-        standardControls.Main.Run.canceled -= ctx => Run = false;
+        standardControls.Main.Run.performed -= OnRunPerformed;
+        standardControls.Main.Run.canceled -= OnRunCanceled;
 
-        standardControls.Main.Crouch.performed -= ctx => Crouch = true;
-        standardControls.Main.Crouch.canceled -= ctx => Crouch = false;
+        standardControls.Main.Crouch.performed -= OnCrouchPerformed;
+        standardControls.Main.Crouch.canceled -= OnCrouchCanceled;
 
-        standardControls.Firing.PressFire.performed -= ctx => TriggerAction(ctx, OnFirePressed);
+        standardControls.Firing.Aim.performed -= OnAimPerformed;
+        standardControls.Firing.Aim.canceled -= OnAimCanceled;
+
+        standardControls.Firing.PressFire.performed -= OnPressFirePerformed;
 
         standardControls.Firing.HoldFire.started -= HoldStart;
         standardControls.Firing.HoldFire.canceled -= HoldEnd;
 
-        standardControls.Firing.ChooseOne.performed -= ctx => Choose(ctx, 1);
-        standardControls.Firing.ChooseTwo.performed -= ctx => Choose(ctx, 2);
-        standardControls.Firing.Holster.performed -= ctx => Choose(ctx, 0);
+        standardControls.Firing.ChooseOne.performed -= OnChooseOnePerformed;
+        standardControls.Firing.ChooseTwo.performed -= OnChooseTwoPerformed;
+        standardControls.Firing.Holster.performed -= OnHolsterPerformed;
 
-        standardControls.Firing.Reload.performed -= ctx => TriggerAction(ctx, OnReloadTap);
+        standardControls.Firing.Reload.performed -= OnReloadPerformed;
     }
+
+    #region --- Handler Methods ---
+
+    private void OnMovePerformed(InputAction.CallbackContext ctx) => Move = ctx.ReadValue<Vector2>();
+    private void OnMoveCanceled(InputAction.CallbackContext ctx) => Move = Vector2.zero;
+
+    private void OnMousePerformed(InputAction.CallbackContext ctx) => Mouse = ctx.ReadValue<Vector2>();
+    private void OnMouseCanceled(InputAction.CallbackContext ctx) => Mouse = Vector2.zero;
+
+    private void OnJumpPerformed(InputAction.CallbackContext ctx) => Jump = true;
+    private void OnJumpCanceled(InputAction.CallbackContext ctx) => Jump = false;
+
+    private void OnRunPerformed(InputAction.CallbackContext ctx) => Run = true;
+    private void OnRunCanceled(InputAction.CallbackContext ctx) => Run = false;
+
+    private void OnCrouchPerformed(InputAction.CallbackContext ctx) => Crouch = true;
+    private void OnCrouchCanceled(InputAction.CallbackContext ctx) => Crouch = false;
+
+    private void OnAimPerformed(InputAction.CallbackContext ctx) => IsAiming = true;
+    private void OnAimCanceled(InputAction.CallbackContext ctx) => IsAiming = false;
+
+    private void OnPressFirePerformed(InputAction.CallbackContext ctx) => TriggerAction(ctx, OnFirePressed);
+
+    private void OnChooseOnePerformed(InputAction.CallbackContext ctx) => Choose(ctx, 1);
+    private void OnChooseTwoPerformed(InputAction.CallbackContext ctx) => Choose(ctx, 2);
+    private void OnHolsterPerformed(InputAction.CallbackContext ctx) => Choose(ctx, 0);
+
+    private void OnReloadPerformed(InputAction.CallbackContext ctx) => TriggerAction(ctx, OnReloadTap);
+
+    #endregion
 
     void TriggerAction(InputAction.CallbackContext ctx, Action action) { action?.Invoke(); }
     void HoldStart(InputAction.CallbackContext ctx)

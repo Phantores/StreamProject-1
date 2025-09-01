@@ -45,6 +45,8 @@ namespace Player.Weapons{
         public float burstRate;
         public int burstCount;
 
+        public float fireTime => burstRate * burstCount + fireRate;
+
         public float damage;
 
         public int maxAmmo;
@@ -56,6 +58,8 @@ namespace Player.Weapons{
         public Vector2[] recoil;
 
         public float weightMultiplier;
+        public float aimSpeedMultiplier;
+        public float aimTime;
 
         public AnimationCurve chargeAttenuation = AnimationCurve.Constant(0, 1, 1);
         public AnimationCurve reloadAttenuation = AnimationCurve.Linear(0, 0, 1, 1);

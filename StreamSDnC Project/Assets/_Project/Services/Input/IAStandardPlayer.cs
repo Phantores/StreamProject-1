@@ -252,7 +252,16 @@ namespace Controls
                     ""id"": ""452ea368-b0ed-4806-8b1c-42a604c193ee"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""SlowTap"",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Aim"",
+                    ""type"": ""Button"",
+                    ""id"": ""85196cfb-abc7-4bad-893d-32a178248279"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],
@@ -260,10 +269,10 @@ namespace Controls
                 {
                     ""name"": """",
                     ""id"": ""29f11af6-e361-4be9-8daa-230a9ac2c7d6"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mouse & Keyboard"",
                     ""action"": ""HoldFire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -271,10 +280,10 @@ namespace Controls
                 {
                     ""name"": """",
                     ""id"": ""c24a7df8-1d4e-4291-8cef-b407b17dd74e"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mouse & Keyboard"",
                     ""action"": ""PressFire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -315,11 +324,22 @@ namespace Controls
                 {
                     ""name"": """",
                     ""id"": ""e0da3450-5046-40f7-b7da-511df1632e02"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mouse & Keyboard"",
                     ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""24eb7f57-8d66-42a8-b0fb-9a318218ba4e"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse & Keyboard"",
+                    ""action"": ""Aim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -361,6 +381,7 @@ namespace Controls
             m_Firing_ChooseTwo = m_Firing.FindAction("ChooseTwo", throwIfNotFound: true);
             m_Firing_Holster = m_Firing.FindAction("Holster", throwIfNotFound: true);
             m_Firing_Reload = m_Firing.FindAction("Reload", throwIfNotFound: true);
+            m_Firing_Aim = m_Firing.FindAction("Aim", throwIfNotFound: true);
         }
 
         ~@IAStandardPlayer()
@@ -520,6 +541,7 @@ namespace Controls
         private readonly InputAction m_Firing_ChooseTwo;
         private readonly InputAction m_Firing_Holster;
         private readonly InputAction m_Firing_Reload;
+        private readonly InputAction m_Firing_Aim;
         public struct FiringActions
         {
             private @IAStandardPlayer m_Wrapper;
@@ -530,6 +552,7 @@ namespace Controls
             public InputAction @ChooseTwo => m_Wrapper.m_Firing_ChooseTwo;
             public InputAction @Holster => m_Wrapper.m_Firing_Holster;
             public InputAction @Reload => m_Wrapper.m_Firing_Reload;
+            public InputAction @Aim => m_Wrapper.m_Firing_Aim;
             public InputActionMap Get() { return m_Wrapper.m_Firing; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -557,6 +580,9 @@ namespace Controls
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
+                @Aim.started += instance.OnAim;
+                @Aim.performed += instance.OnAim;
+                @Aim.canceled += instance.OnAim;
             }
 
             private void UnregisterCallbacks(IFiringActions instance)
@@ -579,6 +605,9 @@ namespace Controls
                 @Reload.started -= instance.OnReload;
                 @Reload.performed -= instance.OnReload;
                 @Reload.canceled -= instance.OnReload;
+                @Aim.started -= instance.OnAim;
+                @Aim.performed -= instance.OnAim;
+                @Aim.canceled -= instance.OnAim;
             }
 
             public void RemoveCallbacks(IFiringActions instance)
@@ -622,6 +651,7 @@ namespace Controls
             void OnChooseTwo(InputAction.CallbackContext context);
             void OnHolster(InputAction.CallbackContext context);
             void OnReload(InputAction.CallbackContext context);
+            void OnAim(InputAction.CallbackContext context);
         }
     }
 }

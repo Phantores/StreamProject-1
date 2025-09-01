@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
+
     float sensitivity = 1f;
     float viewLimit = 80f;
 
@@ -12,8 +13,10 @@ public class CameraController : MonoBehaviour
     float verticalAngle = 0f;
 
     GameObject Parent;
+    Animator animator => this.gameObject.GetComponent<Animator>();
 
     public Camera Camera => this.gameObject.GetComponent<Camera>();
+
 
     public void SetData(float sens, float view, GameObject Par = null)
     {
@@ -26,6 +29,12 @@ public class CameraController : MonoBehaviour
     {
         horizontalRotation = rotation.x;
         verticalRotation = rotation.y;
+    }
+
+    public void Aim(bool aim, float ads = 1)
+    {
+        animator.SetBool("Aiming", aim);
+        animator.SetFloat("Ads", ads);
     }
 
     private void Update()

@@ -86,13 +86,26 @@ namespace Player.Weapons{
             }
             return null;
         }
+
+        public bool IsWeaponNull(HoldState holdState)
+        {
+            switch (holdState)
+            {
+                case HoldState.Main:
+                    return mainWeapon == null;
+                case HoldState.Side:
+                    return sideWeapon == null;
+                default:
+                    return false;
+            }
+        }
         #endregion
 
         #region ShootingMethods
 
         internal void Shoot(float time, Weapon weapon, Vector2 recoil)
         {
-            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Shooting);
+            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Shooting, weapon.data.GameData.fireTime);
             Ray ray = _cameraCont.Camera.ScreenPointToRay(InputManager.Instance.MousePosition);
             if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
             {
@@ -103,16 +116,16 @@ namespace Player.Weapons{
                 }
             }
             _cameraCont.PassRotation(recoil);
-            _ctx.Runner.mainHud.UpdateAmmo(weapon.currentAmmo, weapon.carriedAmmo);
+            _ctx.Runner.mainHud.UpdateAmmo(weapon.currentAmmo, weapon.reserveAmmo);
         }
 
         internal void Reload(Weapon weapon)
         {
-            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Reloading);
+            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Reloading, weapon.data.GameData.reloadTime);
         }
         internal void Cancel()
         {
-            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Idle);
+            _center.weaponModel.ScheduleAnimation(ModelController.AnimationMode.Cancel);
         }
 
         public Task ShootWeapon(float timestamp = timecheck)
@@ -136,7 +149,7 @@ namespace Player.Weapons{
     {
         public WeaponData data { get; private set; }
         public int currentAmmo { get; private set; } = 0;
-        public int carriedAmmo { get; private set; } = 0;
+        public int reserveAmmo { get; private set; } = 0;
 
         WeaponGameData gameData => data.GameData;
 
@@ -153,7 +166,7 @@ namespace Player.Weapons{
             wh = Parent;
 
             currentAmmo = gameData.clipSize;
-            carriedAmmo = gameData.maxAmmo / 2;
+            reserveAmmo = gameData.maxAmmo / 2;
         }
 
         public void SetData(WeaponData weaponData)
@@ -165,20 +178,20 @@ namespace Player.Weapons{
         {
             int space = Math.Max(0, gameData.clipSize - currentAmmo);
             int portion = gameData.reloadPortion.HasValue ? gameData.reloadPortion.Value : space;
-            int toLoad = Math.Min(space, Math.Min(portion, carriedAmmo));
+            int toLoad = Math.Min(space, Math.Min(portion, reserveAmmo));
 
             if (toLoad < 0) toLoad = 0;
 
-            carriedAmmo += toLoad;
-            currentAmmo -= toLoad;
+            reserveAmmo -= toLoad;
+            currentAmmo += toLoad;
 
-            wh._ctx.Runner.mainHud.UpdateAmmo(currentAmmo, carriedAmmo);
+            wh._ctx.Runner.mainHud.UpdateAmmo(currentAmmo, reserveAmmo);
         }
 
-        bool ReloadEval() // make sure is complete
+        public bool ReloadEval() // make sure is complete
         {
-            if (carriedAmmo == 0) return false;
-            if (currentAmmo == gameData.maxAmmo) return false;
+            if (reserveAmmo <= 0) return false;
+            if (currentAmmo >= gameData.clipSize) return false;
 
 
             return true;
@@ -192,7 +205,7 @@ namespace Player.Weapons{
                 wh.Shoot(Time.time - chargeTimeStamp, this, gameData.recoil[currentAmmo]);
                 return true;
             }
-            else if (carriedAmmo > 0 && !firedOnce)
+            else if (reserveAmmo > 0 && !firedOnce)
             {
                 // idk prompt to reload or something
                 return false;
@@ -207,14 +220,16 @@ namespace Player.Weapons{
         public async Task BurstCoroutine()
         {
             skipDelay = false;
-            for (int i = 0; i < gameData.burstCount; i++)
-            {
-                if (!TryShoot()) { skipDelay = true; break;}
-                firedOnce = true;
-                await CoroutineRunner.Instance.DelayScaled(gameData.burstRate);
-            }
-            if(!skipDelay) await CoroutineRunner.Instance.DelayScaled(gameData.fireRate - gameData.burstRate);
-            firedOnce = false;
+
+                for (int i = 0; i < gameData.burstCount; i++)
+                {
+                    if (!TryShoot()) { skipDelay = true; break;}
+                    firedOnce = true;
+                    await CoroutineRunner.Instance.DelayScaled(gameData.burstRate);
+                }
+                firedOnce = false;
+                if (!skipDelay) await CoroutineRunner.Instance.DelayScaled(gameData.fireRate - gameData.burstRate);
+
         }
 
         public async Task ReloadCoroutine(CancellationToken ct)
@@ -224,22 +239,22 @@ namespace Player.Weapons{
 
             try
             {
-                if(gameData.reloadPortion == null && ReloadEval())
+                if(!gameData.reloadPortion.HasValue && ReloadEval())
                 {
                     wh.Reload(this);
                     await CoroutineRunner.Instance.DelayScaled(gameData.reloadTime * gameData.reloadAttenuation.Evaluate(currentAmmo / gameData.clipSize), ct);
-                    if (_softReloadCancel)
-                    {
-                        wh.Cancel();
-                        return;
-                    }
+                    ct.ThrowIfCancellationRequested(); // fixed this
                     Reload();
                 }
-                else
+                else if(gameData.reloadPortion.HasValue)
                 {
                     while(ReloadEval())
                     {
-                        if (_softReloadCancel) break;
+                        if (_softReloadCancel)
+                        {
+                            wh.Cancel();
+                            break;
+                        }
                         ct.ThrowIfCancellationRequested();
 
                         wh.Reload(this);
@@ -250,7 +265,7 @@ namespace Player.Weapons{
                             wh.Cancel();
                             break;
                         }
-                        if(ct.IsCancellationRequested) ct.ThrowIfCancellationRequested();
+                        ct.ThrowIfCancellationRequested();
 
                         Reload();
                     }
@@ -263,6 +278,7 @@ namespace Player.Weapons{
             finally
             {
                 wh.ChangeReloadState(false);
+                wh.Cancel();
             }
 
         }

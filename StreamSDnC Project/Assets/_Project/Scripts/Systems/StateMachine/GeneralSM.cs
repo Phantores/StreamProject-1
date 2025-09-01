@@ -4,6 +4,7 @@ using UnityEngine;
 public interface IState<TId, TCtx> where TId : System.Enum
 {
     TId Id { get; }
+    TCtx _ctx { get; }
     public void SubUpdate(float dt, TCtx ctx);
 
     public void Enter(ITransition<TId> via, TCtx ctx);
