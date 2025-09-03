@@ -61,7 +61,7 @@ namespace UI_Docs{
                         sideWeaponLabel.style.backgroundColor = unselectedColor;
 
                         mainWeaponLabel.style.color = unselectedTextColor;
-                        sideWeaponLabel.style.color = unselectedColor;
+                        sideWeaponLabel.style.color = unselectedTextColor;
                         break;
                     }
                 case WeaponHandler.HoldState.Main:
@@ -70,7 +70,7 @@ namespace UI_Docs{
                         sideWeaponLabel.style.backgroundColor = unselectedColor;
 
                         mainWeaponLabel.style.color = selectedTextColor;
-                        sideWeaponLabel.style.color = unselectedColor;
+                        sideWeaponLabel.style.color = unselectedTextColor;
                         break;
                     }
                 case WeaponHandler.HoldState.Side:
@@ -78,8 +78,8 @@ namespace UI_Docs{
                         sideWeaponLabel.style.backgroundColor = selectedColor;
                         mainWeaponLabel.style.backgroundColor = unselectedColor;
 
-                        sideWeaponLabel.style.unityTextOutlineColor = selectedTextColor;
-                        mainWeaponLabel.style.unityTextOutlineColor = unselectedColor;
+                        sideWeaponLabel.style.color = selectedTextColor;
+                        mainWeaponLabel.style.color = unselectedTextColor;
                         break;
                     }
                 default:
@@ -88,7 +88,7 @@ namespace UI_Docs{
                             sideWeaponLabel.style.backgroundColor = unselectedColor;
 
                             mainWeaponLabel.style.color = unselectedTextColor;
-                            sideWeaponLabel.style.color = unselectedColor;
+                            sideWeaponLabel.style.color = unselectedTextColor;
                             break;
                         }
             }

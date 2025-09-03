@@ -27,6 +27,8 @@ public class InputManager : Singleton<InputManager>
 
     public event Action OnReloadTap;
 
+    public event Action Interact;
+
     protected override void Awake()
     {
         base.Awake();
@@ -61,6 +63,8 @@ public class InputManager : Singleton<InputManager>
         standardControls.Firing.Holster.performed += OnHolsterPerformed;
 
         standardControls.Firing.Reload.performed += OnReloadPerformed;
+
+        standardControls.Main.Interact.performed += OnInteract;
     }
 
     public void Disable()
@@ -103,6 +107,8 @@ public class InputManager : Singleton<InputManager>
         standardControls.Firing.Holster.performed -= OnHolsterPerformed;
 
         standardControls.Firing.Reload.performed -= OnReloadPerformed;
+
+        standardControls.Main.Interact.performed -= OnInteract;
     }
 
     #region --- Handler Methods ---
@@ -132,6 +138,8 @@ public class InputManager : Singleton<InputManager>
     private void OnHolsterPerformed(InputAction.CallbackContext ctx) => Choose(ctx, 0);
 
     private void OnReloadPerformed(InputAction.CallbackContext ctx) => TriggerAction(ctx, OnReloadTap);
+
+    private void OnInteract(InputAction.CallbackContext ctx) => TriggerAction(ctx, Interact);
 
     #endregion
 

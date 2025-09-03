@@ -103,6 +103,8 @@ public enum StateEnum
 
             InputManager.Instance.WeaponChanged += OnWeaponChanged;
             InputManager.Instance.OnReloadTap += OnReloadTap;
+
+            InputManager.Instance.Interact += OnInteract;
         }
         
         public void Exit(ITransition<StateEnum> via, PlayerContext ctx) 
@@ -115,6 +117,12 @@ public enum StateEnum
 
             InputManager.Instance.WeaponChanged -= OnWeaponChanged;
             InputManager.Instance.OnReloadTap -= OnReloadTap;
+
+            InputManager.Instance.Interact -= OnInteract;
+
+            _reloadCts?.Cancel();
+            _reloadCts?.Dispose();
+            _reloadCts = null;
         }
 
         #region Lambdas
@@ -122,8 +130,11 @@ public enum StateEnum
         void OnHoldChanged(bool state) => HoldChanged(state);
         void OnWeaponChanged(int index) => Choose(index);
         void OnReloadTap() => HandleReload();
+        void OnInteract() => Interact();
 
+        void Interact() { Debug.Log("PressedInteract");  _ctx.ih.CastInteract(); }
         void SetSemiFire() {
+            if (_ctx.ih._isInteracting) _ctx.ih.ThrowObject();
             if (_ctx.wh.GetCurrentWeapon() == null) return;
             if (_fireMode(_ctx) == FireMode.SemiAuto) {
                 isSemiFiring = true;
@@ -201,7 +212,7 @@ public enum StateEnum
 
             // Execute motion
             _controller.cc.Move(_motionVector * dt);
-            _ctx.Camera.PassRotation(InputManager.Instance.Mouse);
+            _ctx.Camera.PassRotation(InputManager.Instance.Mouse, InputManager.Instance.Move.x * _ctx.Data.tiltStrength);
             if (_ctx.wh.GetCurrentWeapon() != null) {
                 _ctx.WeaponCenter.Aim(InputManager.Instance.IsAiming);
                 _ctx.Camera.Aim(InputManager.Instance.IsAiming, adsTime); 
@@ -239,8 +250,9 @@ public enum StateEnum
 
         void HandleReload()
         {
-            if(!_ctx.wh.Reloading && _ctx.wh.GetCurrentWeapon().ReloadEval())
+            if(!_ctx.wh.Reloading && _ctx.wh.GetCurrentWeapon() != null)
             {
+                if (!_ctx.wh.GetCurrentWeapon().ReloadEval()) return;
                 _reloadCts?.Dispose();
                 _reloadCts = new CancellationTokenSource();
                 _reloadTask = _ctx.wh.ReloadWeapon(_reloadCts.Token);

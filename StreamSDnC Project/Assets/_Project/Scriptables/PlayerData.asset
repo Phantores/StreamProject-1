@@ -16,6 +16,9 @@ MonoBehaviour:
   <jumpForce>k__BackingField: 10
   <runMult>k__BackingField: 3
   <crouchMult>k__BackingField: 0.25
+  <crouchMagnitude>k__BackingField: 0
+  <tiltStrength>k__BackingField: 0.2
   <mouseSensitivity>k__BackingField: 0.2
   <viewLimit>k__BackingField: 85
   <terminalVelocity>k__BackingField: 40
+  <interactionRange>k__BackingField: 2

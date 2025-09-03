@@ -12,6 +12,7 @@ namespace Player{
         public PlayerData Data { get; private set; }
 
         public WeaponHandler wh { get; private set; } = null;
+        public InteractionHandler ih { get; private set; }
 
         //
 
@@ -23,6 +24,7 @@ namespace Player{
             Camera = camera;
 
             wh = new WeaponHandler(this);
+            ih = new InteractionHandler(this);
             WeaponCenter = weaponCenter;
         }
 

@@ -12,6 +12,8 @@ public class CameraController : MonoBehaviour
 
     float verticalAngle = 0f;
 
+    float tilt = 0f;
+
     GameObject Parent;
     Animator animator => this.gameObject.GetComponent<Animator>();
 
@@ -25,10 +27,11 @@ public class CameraController : MonoBehaviour
         Parent = Par;
     }
 
-    public void PassRotation(Vector2 rotation)
+    public void PassRotation(Vector2 rotation, float tiltInput = 0)
     {
         horizontalRotation = rotation.x;
         verticalRotation = rotation.y;
+        tilt = tiltInput;
     }
 
     public void Aim(bool aim, float ads = 1)
@@ -43,6 +46,6 @@ public class CameraController : MonoBehaviour
 
         verticalAngle -= verticalRotation * sensitivity;
         verticalAngle = Mathf.Clamp(verticalAngle, -viewLimit, viewLimit);
-        transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);
+        transform.localRotation = Quaternion.Euler(verticalAngle, 0, tilt);
     }
 }

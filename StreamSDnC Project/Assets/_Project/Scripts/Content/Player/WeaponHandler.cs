@@ -62,13 +62,45 @@ namespace Player.Weapons{
             }
             else
             {
-                weapon = null;
                 weapon = new Weapon(weaponData, this);
             }
 
             if (main) mainWeapon = weapon;
             else sideWeapon = weapon;
             _ctx.Runner.mainHud.UpdateWeapon(weapon, main, _holdState, false, true);
+        }
+
+        public void CollectWeapon(WeaponData weaponData)
+        {
+            if(weaponData == null) return;
+
+            bool where = true;
+            if (mainWeapon == null) where = true;
+            else if (sideWeapon == null) where = false;
+            else
+            {
+                switch (_holdState)
+                {
+                    case HoldState.Main:
+                        {
+                            where = true;
+                            break;
+                        }
+                    case HoldState.Side:
+                        {
+                            where = false;
+                            break;
+                        }
+                    default:
+                        {
+                            where = true;
+                            break;
+                        }
+                }
+            }
+
+            SetWeapon(where, weaponData);
+
         }
 
         public Weapon GetCurrentWeapon()

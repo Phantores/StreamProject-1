@@ -82,6 +82,15 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""ff0fc63f-13d3-41f3-b368-f86a4140c102"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,17 @@ namespace Controls
                     ""processors"": """",
                     ""groups"": "";Mouse & Keyboard"",
                     ""action"": ""MousePos"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ac82aacf-64ec-47e2-93dc-5513dd03d149"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -373,6 +393,7 @@ namespace Controls
             m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
             m_Main_Crouch = m_Main.FindAction("Crouch", throwIfNotFound: true);
             m_Main_MousePos = m_Main.FindAction("MousePos", throwIfNotFound: true);
+            m_Main_Interact = m_Main.FindAction("Interact", throwIfNotFound: true);
             // Firing
             m_Firing = asset.FindActionMap("Firing", throwIfNotFound: true);
             m_Firing_HoldFire = m_Firing.FindAction("HoldFire", throwIfNotFound: true);
@@ -455,6 +476,7 @@ namespace Controls
         private readonly InputAction m_Main_Run;
         private readonly InputAction m_Main_Crouch;
         private readonly InputAction m_Main_MousePos;
+        private readonly InputAction m_Main_Interact;
         public struct MainActions
         {
             private @IAStandardPlayer m_Wrapper;
@@ -465,6 +487,7 @@ namespace Controls
             public InputAction @Run => m_Wrapper.m_Main_Run;
             public InputAction @Crouch => m_Wrapper.m_Main_Crouch;
             public InputAction @MousePos => m_Wrapper.m_Main_MousePos;
+            public InputAction @Interact => m_Wrapper.m_Main_Interact;
             public InputActionMap Get() { return m_Wrapper.m_Main; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -492,6 +515,9 @@ namespace Controls
                 @MousePos.started += instance.OnMousePos;
                 @MousePos.performed += instance.OnMousePos;
                 @MousePos.canceled += instance.OnMousePos;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
             }
 
             private void UnregisterCallbacks(IMainActions instance)
@@ -514,6 +540,9 @@ namespace Controls
                 @MousePos.started -= instance.OnMousePos;
                 @MousePos.performed -= instance.OnMousePos;
                 @MousePos.canceled -= instance.OnMousePos;
+                @Interact.started -= instance.OnInteract;
+                @Interact.performed -= instance.OnInteract;
+                @Interact.canceled -= instance.OnInteract;
             }
 
             public void RemoveCallbacks(IMainActions instance)
@@ -642,6 +671,7 @@ namespace Controls
             void OnRun(InputAction.CallbackContext context);
             void OnCrouch(InputAction.CallbackContext context);
             void OnMousePos(InputAction.CallbackContext context);
+            void OnInteract(InputAction.CallbackContext context);
         }
         public interface IFiringActions
         {

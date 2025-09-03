@@ -24,7 +24,7 @@ MonoBehaviour:
     burstCount: 1
     damage: 15
     maxAmmo: 120
-    clipSize: 10
+    clipSize: 12
     reloadPortion:
       HasValue: 0
       Value: 0
@@ -40,6 +40,8 @@ MonoBehaviour:
     - {x: -0.18, y: 2.4}
     - {x: 0.35, y: 1.22}
     - {x: 0.18, y: 2.51}
+    - {x: 0.39, y: 3.12}
+    - {x: -0.24, y: 0.96}
     weightMultiplier: 0.95
     aimSpeedMultiplier: 0.8
     aimTime: 1
