@@ -22,3 +22,8 @@ MonoBehaviour:
   <viewLimit>k__BackingField: 85
   <terminalVelocity>k__BackingField: 40
   <interactionRange>k__BackingField: 2
+  <throwStrength>k__BackingField: 8
+  <holdOffset>k__BackingField: {x: 0, y: 0, z: 1.5}
+  <holdStrength>k__BackingField: 5
+  <holdDistanceLimit>k__BackingField: 1.04
+  <holdHeightLimit>k__BackingField: 0.37

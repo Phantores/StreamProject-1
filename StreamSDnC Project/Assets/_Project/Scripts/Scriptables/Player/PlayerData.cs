@@ -19,4 +19,9 @@ public class PlayerData : ScriptableObject
     [field: SerializeField] public float interactionRange { get; private set; }
 
     [field: SerializeField] public float throwStrength { get; private set; } = 1;
+
+    [field: SerializeField] public Vector3 holdOffset { get; private set; } = Vector3.forward;
+    [field: SerializeField] public int holdStrength { get; private set; } = 1;
+    [field: SerializeField] public float holdDistanceLimit { get; private set; } = 2;
+    [field: SerializeField] public float holdHeightLimit { get; private set; } = 1;
 }

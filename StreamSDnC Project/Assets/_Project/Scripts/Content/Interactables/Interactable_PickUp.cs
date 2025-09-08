@@ -1,9 +1,29 @@
-﻿using UnityEngine;
+﻿using Player;
+using UnityEngine;
 
 public class Interactable_Pickup : Interactable
 {
     Rigidbody rb;
-    GameObject isHeld;
+    InteractionHandler owner;
+    Vector3 target;
+    Vector3 partialTarget;
+
+    bool isRelativelyHeavy;
+
+    bool thrown;
+
+    Vector3 Dir()
+    {
+        Vector3 output = target - transform.position;
+        output.Normalize();
+        return output;
+    }
+    Vector3 ThrowDir()
+    {
+        Vector3 dir = owner._ctx.Data.holdOffset;
+        dir.Normalize();
+        return owner._ctx.Camera.transform.rotation * dir;
+    }
     private void OnValidate()
     {
 #if UNITY_EDITOR
@@ -16,15 +36,59 @@ public class Interactable_Pickup : Interactable
         rb = GetComponent<Rigidbody>();
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
-        if(isHeld) transform.position = isHeld.transform.position;
+        if (owner == null || rb == null) return;
+        if(thrown)
+        {
+            thrown = false;
+            return;
+        }
+        partialTarget = owner._ctx.Camera.transform.rotation * owner._ctx.Data.holdOffset;
+        target = owner._ctx.Camera.transform.position + VectorUtils.CappedSphereNormalize(partialTarget, owner._ctx.Data.holdOffset.z, owner._ctx.Data.holdHeightLimit);
+        if(CheckDispose()) return;
+        if (!isRelativelyHeavy)
+        {
+            rb.MovePosition(target);
+        } else
+        {
+            rb.AddForce(Dir() * owner._ctx.Data.holdStrength);
+        }
+    }
+
+    bool CheckDispose()
+    {
+        if (Vector3.Distance(rb.position, target) / owner._ctx.Data.holdDistanceLimit <= owner._ctx.Data.holdStrength / rb.mass)
+        {
+            return false;
+        }
+        owner.ForceDrop();
+        Drop();
+        return true;
     }
 
     protected override void InInteract() { }
 
-    public void ThrowObject(Vector3 direction, float force)
+    public void SetOwner(InteractionHandler ih)
     {
-        rb.AddForce(direction * force);
+        owner = ih;
+        isRelativelyHeavy = rb.mass > owner._ctx.Data.holdStrength;
+        if(isRelativelyHeavy)
+        {
+            rb.useGravity = true;
+        } else
+        {
+            rb.useGravity = false;
+        }
+    }
+
+    public void Drop() { owner = null; rb.useGravity = true; Debug.Log("dropped"); }
+
+    public void ThrowObject()
+    {
+        thrown = true;
+        rb.useGravity = true;
+        rb.AddForce(ThrowDir() * owner._ctx.Data.throwStrength, ForceMode.Impulse);
+        owner = null;
     }
 }

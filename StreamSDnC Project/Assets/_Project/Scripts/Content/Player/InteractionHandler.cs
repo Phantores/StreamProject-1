@@ -18,7 +18,7 @@ namespace Player{
             // 1. Check if you hold
             if(_isInteracting)
             {
-                heldInteractable.Drop();
+                if (heldInteractable is Interactable_Pickup ict) ict.Drop();
                 heldInteractable = null;
                 _isInteracting = false;
                 return;
@@ -56,6 +56,7 @@ namespace Player{
                         }
                     case Interactable_Pickup ict:
                         {
+                            ict.SetOwner(this);
                             ict.Interact();
                             _isInteracting = true;
                             break;
@@ -75,9 +76,15 @@ namespace Player{
             }
         }
 
+        public void ForceDrop()
+        {
+            _isInteracting = false;
+        }
+
         public void ThrowObject()
         {
             _isInteracting = false;
+            if (heldInteractable is Interactable_Pickup ict) ict.ThrowObject();
         }
     }
 }

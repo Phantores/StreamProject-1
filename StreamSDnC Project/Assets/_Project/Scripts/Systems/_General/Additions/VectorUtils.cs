@@ -14,4 +14,51 @@ public static class VectorUtils
         }
         return output;
     }
+
+    public static bool CappedSphereCheck(Vector3 target, Vector3 origin, float radius, float height)
+    {
+        Vector3 result = target - origin;
+        if(result.sqrMagnitude >= radius*radius)
+        {
+            return true;
+        } else if(Mathf.Abs(result.y) >= height)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Vector3 CappedSphereNormalize(Vector3 target, Vector3 origin, float radius, float height)
+    {
+        Vector3 result = target - origin;
+        
+        if( result.sqrMagnitude >= radius*radius)
+        {
+            result.Normalize();
+            result *= radius;
+        } else if(Mathf.Abs(result.y) >= height)
+        {
+            result.y = Mathf.Sign(result.y) * height;
+        }
+
+        return result;
+    }
+
+    public static Vector3 CappedSphereNormalize(Vector3 target, float radius, float height)
+    {
+        Vector3 result = target;
+
+        if (result.sqrMagnitude >= radius * radius)
+        {
+            result.Normalize();
+            result *= radius;
+        }
+        else if (Mathf.Abs(result.y) >= height)
+        {
+            result.y = Mathf.Sign(result.y) * height;
+        }
+
+        return result;
+    }
 }

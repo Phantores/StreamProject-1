@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using Player;
 using UnityEngine.SceneManagement;
+using Level;
 
 public class LevelManager : Singleton<LevelManager>
 {
     PlayerController player = null;
     public enum LoadMode { ToGame, ToMenu, ToCutscene}
     LoadMode flag = LoadMode.ToGame;
+
+    List<ZoneRegistry> zoneRegistries = new List<ZoneRegistry>();
 
     public void SetPlayer(PlayerController player) {  this.player = player; }
 
@@ -71,8 +75,17 @@ public class LevelManager : Singleton<LevelManager>
         }
         catch (ArgumentException e)
         {
-            UnityEngine.Debug.LogError("Wrong string exception: " + e.Message);
+            UnityEngine.Debug.LogError(e.Message);
             return;
         }
+    }
+
+    public void RegisterZone(ZoneRegistry registry)
+    {
+        if (registry == null && !zoneRegistries.Contains(registry)) zoneRegistries.Add(registry);
+    }
+    public void UnregisterZone(ZoneRegistry registry)
+    {
+        zoneRegistries.Remove(registry);
     }
 }

@@ -5,7 +5,7 @@ public abstract class Interactable : MonoBehaviour
 {
     [SerializeField] string message;
 
-    Rigidbody rb;
+    GameObject parent;
 
     public void Interact()
     {
@@ -15,6 +15,4 @@ public abstract class Interactable : MonoBehaviour
     }
 
     protected abstract void InInteract(); // add a way to pass args nicely
-
-    public void Drop() { } // move to Pickup
 }
