@@ -1,3 +1,5 @@
+using Unity.Mathematics;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 
 public static class VectorUtils
@@ -60,5 +62,18 @@ public static class VectorUtils
         }
 
         return result;
+    }
+}
+
+public struct Float3Utils
+{
+    public static float Magnitude(float3 vec)
+    {
+        return Mathf.Sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    }
+
+    public static float Dot(float3 lhs, float3 rhs)
+    {
+        return lhs.x * rhs.x + lhs.y*rhs.y + lhs.z * rhs.z;
     }
 }

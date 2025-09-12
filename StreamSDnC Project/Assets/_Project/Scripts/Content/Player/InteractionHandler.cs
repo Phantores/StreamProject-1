@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Player{
 
@@ -10,7 +11,15 @@ namespace Player{
         public bool _isInteracting { get; private set; } = false;
         Interactable heldInteractable;
 
-        public InteractionHandler(PlayerContext ctx) { _ctx = ctx; }
+        ITargetFilter _filter;
+        ITargetScorer _scorer;
+
+        public InteractionHandler(PlayerContext ctx)
+        {
+            _ctx = ctx;
+            _filter = new ConeFilter();
+            _scorer = new SpikeScorer();
+        }
 
         public void CastInteract()
         {
@@ -25,11 +34,7 @@ namespace Player{
             }
 
             // 2. Cast
-            Ray ray = _cameraCont.Camera.ScreenPointToRay(InputManager.Instance.MousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit, _ctx.Data.interactionRange))
-            {
-                heldInteractable = hit.transform.gameObject.GetComponent<Interactable>();
-            }
+            TryTargetQuery();
 
             // 3. Evaluate
             if (heldInteractable != null)
@@ -85,6 +90,32 @@ namespace Player{
         {
             _isInteracting = false;
             if (heldInteractable is Interactable_Pickup ict) ict.ThrowObject();
+        }
+
+        public void TryTargetQuery()
+        {
+            Vector3 origin = _ctx.Camera.transform.position;
+            Vector3 forward = _ctx.Camera.transform.forward;
+
+            TargetContext ctx = _ctx.QuerySensor.BuildContext(origin, forward, _ctx.Data.interactionRange);
+
+            var candidates = _ctx.QuerySensor._set;
+            var filters = new List<ITargetFilter>() {_filter}; // Populate as needed
+            var scorers = new List<ITargetScorer>() {_scorer}; // Populate as needed
+
+            Targetable best = TargetQuery.FindBest(ctx, candidates, filters, scorers);
+
+            if(best)
+            {
+                Debug.Log("Found best candidate");
+                heldInteractable = best.gameObject.GetComponent<Interactable>();
+            }
+            if (heldInteractable != null && heldInteractable.needsLineOfSight)
+            {
+                Debug.Log("Found interactable before LOS check");
+                bool check = _ctx.QuerySensor.HasLineOfSight(best);
+                if (!check) heldInteractable = null;
+            }
         }
     }
 }

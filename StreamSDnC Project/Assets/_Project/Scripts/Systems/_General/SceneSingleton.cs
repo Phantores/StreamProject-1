@@ -10,10 +10,6 @@ public abstract class SceneSingleton<T> : MonoBehaviour where T : MonoBehaviour
             if(_instance  == null)
             {
                 _instance = FindFirstObjectByType<T>();
-                if(_instance == null)
-                {
-                    Debug.LogError($"No {typeof(T)} instance found in this scene!");
-                }
             }
             return _instance;
         }

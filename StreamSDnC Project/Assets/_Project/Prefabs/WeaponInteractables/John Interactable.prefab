@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8679693966944946184}
   - component: {fileID: 6768969190317804239}
+  - component: {fileID: 6925220434224849874}
+  - component: {fileID: 7987235043420344164}
   - component: {fileID: 3415438204224935327}
   m_Layer: 0
   m_Name: John Interactable
@@ -55,6 +57,47 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.15, z: 0.58}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &6925220434224849874
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5490866303044739365}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.5
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &7987235043420344164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5490866303044739365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1be22c2e5369fa2498775aab34a36444, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 1
+  aimPoint: {fileID: 0}
 --- !u!114 &3415438204224935327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,6 +111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: Picked up John
+  <needsLineOfSight>k__BackingField: 0
   <Weapon>k__BackingField: {fileID: 11400000, guid: 5734ea1f38c0dda4b85c5f1885cfa2ed, type: 2}
 --- !u!1001 &3917697883468298296
 PrefabInstance:

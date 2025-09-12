@@ -10,9 +10,8 @@ namespace Level{
     {
         [field: SerializeField] public List<Zone> zones { get; private set; } = new List<Zone>();
         #region Registration
-        protected override void Awake()
+        void Start()
         {
-            base.Awake();
             LevelManager.Instance.RegisterZone(this);
         }
 
@@ -42,17 +41,7 @@ namespace Level{
         }
         NativeArray<ZoneData> zonesNative;
 
-
-        public void UpdateSimulation(bool enable, Zone caller, Zone secondCaller = null)
-        {
-            UpdateState(enable, caller);
-            if(secondCaller != null)
-            {
-                UpdateState(true, secondCaller);
-            }
-        }
-
-        void UpdateState(bool enable, Zone caller)
+        public void UpdateState(bool enable, Zone caller)
         {
             if (caller == null || !zones.Contains(caller))
             {
@@ -103,11 +92,20 @@ namespace Level{
             {
                 ZoneData zone = zones[index];
                 if (zone.isCaller) return;
-                if(sqrMag(caller.position - zone.position) <= caller.simulationRange*caller.simulationRange)
+                if(mode)
                 {
-                    zone.activeState = mode;
+                    if (sqrMag(caller.position - zone.position) <= caller.simulationRange * caller.simulationRange)
+                    {
+                        zone.activeState = mode;
+                    }
+                } else
+                {
+                    if (sqrMag(caller.position - zone.position) > caller.simulationRange * caller.simulationRange)
+                    {
+                        zone.activeState = mode;
+                    }
                 }
-                zones[index] = zone;
+                    zones[index] = zone;
             }
 
             float sqrMag(float3 vec)

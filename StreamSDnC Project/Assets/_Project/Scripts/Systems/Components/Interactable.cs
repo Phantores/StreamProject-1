@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class Interactable : MonoBehaviour
 {
     [SerializeField] string message;
+    [field: SerializeField] public bool needsLineOfSight {  get; private set; }
 
     GameObject parent;
 

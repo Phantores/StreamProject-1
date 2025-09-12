@@ -9,6 +9,7 @@ namespace Player{
         public readonly PlayerController Runner;
         public readonly CameraController Camera;
         public readonly WeaponCenter WeaponCenter;
+        public readonly QuerySensor QuerySensor;
         public PlayerData Data { get; private set; }
 
         public WeaponHandler wh { get; private set; } = null;
@@ -16,7 +17,13 @@ namespace Player{
 
         //
 
-        public PlayerContext(Transform t, PlayerController runner, PlayerData data, CameraController camera, WeaponCenter weaponCenter)
+        public PlayerContext(
+            Transform t, 
+            PlayerController runner, 
+            PlayerData data, 
+            CameraController camera, 
+            WeaponCenter weaponCenter, 
+            QuerySensor querySensor)
         {
             Transform = t;
             Runner = runner;
@@ -26,6 +33,7 @@ namespace Player{
             wh = new WeaponHandler(this);
             ih = new InteractionHandler(this);
             WeaponCenter = weaponCenter;
+            QuerySensor = querySensor;
         }
 
         public void UpdateData(PlayerData data)
@@ -53,6 +61,7 @@ namespace Player{
 
         [SerializeField] CameraController PlayerCamera;
         [SerializeField] WeaponCenter WeaponCenter;
+        [SerializeField] QuerySensor QuerySensor;
 
         [field: SerializeField] public UI_Docs.MainHudHandler mainHud { get; private set; }
 
@@ -77,12 +86,13 @@ namespace Player{
                 PlayerCamera.SetData(data.mouseSensitivity, data.viewLimit, this.gameObject);
             }
             cc = GetComponent<CharacterController>();
-            ctx = new PlayerContext(transform, this, data, PlayerCamera, WeaponCenter);
+            ctx = new PlayerContext(transform, this, data, PlayerCamera, WeaponCenter, QuerySensor);
         }
 
         private void Start()
         {
             LevelManager.Instance.SetPlayer(this);
+            WorldUIManager.Instance.SetCamera(PlayerCamera.Camera);
             sm = new PlayerSM(ctx, new IState<StateEnum, PlayerContext>[]
             {
                 new OffState(this), new MainState(this, this.ctx),

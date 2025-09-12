@@ -6,4 +6,5 @@
         <engine:Label text="SuperLongWeaponName" name="MainWeapon" style="left: -303px; top: 10px; height: 34px; width: 185px; font-size: 15px; -unity-text-align: middle-center; background-color: rgb(84, 84, 84); color: rgb(178, 178, 178);" />
         <engine:Label text="SuperLongWeaponName" name="SideWeapon" style="left: -303px; top: 10px; height: 34px; width: 185px; font-size: 15px; -unity-text-align: middle-center; background-color: rgb(84, 84, 84); color: rgb(207, 207, 207);" />
     </engine:VisualElement>
+    <engine:VisualElement name="Crosshair" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/_Project/Art/Graphics/Icons/crosshair_debug.png?fileID=2800000&amp;guid=2f96d28c367658c4787cee188fb0eba3&amp;type=3#crosshair_debug&quot;); align-self: flex-start; width: 100px; height: 100px; flex-shrink: 0; top: 540px; left: 960px; bottom: auto; align-items: center; align-content: flex-start; justify-content: center; background-position-x: center 0; transform-origin: center; translate: -50% -50%; position: absolute;" />
 </engine:UXML>

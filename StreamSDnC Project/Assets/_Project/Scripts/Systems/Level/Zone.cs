@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Level{
     [RequireComponent(typeof(Collider))]
@@ -20,7 +19,7 @@ namespace Level{
         }
         private void OnDestroy()
         {
-            ZoneRegistry.Instance.UnregisterZone(this);
+            ZoneRegistry.Instance?.UnregisterZone(this);
         }
 
 #if UNITY_EDITOR
@@ -54,18 +53,13 @@ namespace Level{
             Gizmos.DrawWireSphere(transform.position, simulationRange);
         }
 
-        void InformAround(bool enable, Zone second = null)
-        {
-            ZoneRegistry.Instance.UpdateSimulation(enable, this, second);
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             Simulatable sim = other.GetComponent<Simulatable>();
             if(sim != null)
             {
                 sim.to = this;
-                InformAround(true);
+                ZoneRegistry.Instance.UpdateState(true, this);
             }
         }
 
@@ -74,7 +68,7 @@ namespace Level{
             Simulatable sim = other.GetComponent<Simulatable>();
             if (sim != null)
             {
-                InformAround(false, sim.to);
+                ZoneRegistry.Instance.UpdateState(false, sim.to);
             }
         }
     }
