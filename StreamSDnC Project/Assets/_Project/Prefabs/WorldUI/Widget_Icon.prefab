@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5097652521157561936}
   - component: {fileID: 4270258492972526685}
-  - component: {fileID: 5281726104751433887}
+  - component: {fileID: 4674413368969138494}
+  - component: {fileID: 477613383643298366}
   - component: {fileID: 3600200724813165339}
   m_Layer: 0
   m_Name: Widget_Icon
@@ -46,7 +47,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 956218140554724890}
   m_CullTransparentMesh: 1
---- !u!114 &5281726104751433887
+--- !u!225 &4674413368969138494
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956218140554724890}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &477613383643298366
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,11 +101,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157183a5c81446c49846f821940d3bc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Rect: {fileID: 0}
-  Group: {fileID: 0}
+  Rect: {fileID: 5097652521157561936}
+  Group: {fileID: 4674413368969138494}
   Anchor: {fileID: 0}
   WorldOffset: {x: 0, y: 0.5, z: 0}
-  SmoothTime: 0.08
+  SmoothTime: 0.02
   OcclusionRaycast: 1
   Occluders:
     serializedVersion: 2

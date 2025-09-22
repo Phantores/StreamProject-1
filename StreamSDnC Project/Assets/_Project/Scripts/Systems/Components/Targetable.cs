@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Mathematics;
+using WorldUI;
 
 [System.Flags]
 public enum TargetType
@@ -14,6 +15,8 @@ public class Targetable : MonoBehaviour
     [SerializeField] TargetType type;
     [SerializeField] Transform aimPoint;
 
+    WorldUIProvider providerComponent;
+
     public TargetType Type => type;
     public virtual Transform AimPoint => aimPoint ? aimPoint : transform;
 
@@ -23,6 +26,12 @@ public class Targetable : MonoBehaviour
     public virtual float ExtraScore(in TargetContext ctx) => 0f;
 
     public event Action<Targetable> WillDisable;
+
+    protected virtual void OnEnable()
+    {
+        providerComponent = GetComponent<WorldUIProvider>();
+    }
+
     protected virtual void OnDisable() => WillDisable?.Invoke(this);
 
     public TargetableData ToStruct(TargetContext ctx)
@@ -35,6 +44,13 @@ public class Targetable : MonoBehaviour
             Accept = Accept(ctx),
             ExtraScore = ExtraScore(ctx)
         };
+    }
+
+    public void UpdateWidgets(bool targeting)
+    {
+        if (!providerComponent) return;
+        if (targeting) providerComponent.OnTargetedEnter();
+        else providerComponent.OnTargetedExit();
     }
 }
 

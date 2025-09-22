@@ -148,9 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e4d173630f29af41bc8580ee7bf1f70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Canvas: {fileID: 1325886888683533886, guid: b99993950f95f184c83fe2db51c8a1ab, type: 3}
+  Canvas: {fileID: 876195163}
   IconPrefab: {fileID: 3600200724813165339, guid: 8b252d01e93434d4e80edeeadf0c0099, type: 3}
-  NamePlatePrefab: {fileID: 0}
+  NamePlatePrefab: {fileID: 7060109899796106837, guid: 451ff390ee259da40b53efc9e9aec4b2, type: 3}
+  BarPrefab: {fileID: 1552809812598591429, guid: d9654123f69f86f45802e4a5091939fe, type: 3}
   PrewarmPerType: 8
 --- !u!4 &143608903
 Transform:
@@ -392,7 +393,7 @@ GameObject:
   - component: {fileID: 876195163}
   - component: {fileID: 876195162}
   - component: {fileID: 876195161}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Canvas_WorldUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -447,12 +448,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

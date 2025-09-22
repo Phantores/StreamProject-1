@@ -103,7 +103,7 @@ public struct ConeFilter : ITargetFilter
         float3 dir = t.position - ctx.origin;
         if (Float3Utils.Magnitude(dir) > ctx.maxDistance) return false;
         float dot = Float3Utils.Dot(dir / Float3Utils.Magnitude(dir), ctx.forward);
-        if (dot < Mathf.Cos(ctx.angle)) return false;
+        if (dot < Mathf.Cos(ctx.angle * Mathf.Deg2Rad)) return false;
         return true;
     }
 }

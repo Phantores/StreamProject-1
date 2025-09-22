@@ -19,7 +19,12 @@ namespace WorldUI{
         public float maxWidth;
     }
     [System.Serializable] public struct TooltipData : IWorldUIData { }
-    [System.Serializable] public struct BarData : IWorldUIData { }
+    [System.Serializable] public struct BarData : IWorldUIData
+    {
+        public Vector2 size;
+        public float fill;
+        public Color colorBG, colorFront, colorMid;
+    }
 
     #endregion
 
@@ -41,9 +46,11 @@ namespace WorldUI{
         }
     }
 
-    public interface IWorldUIProvider
+    public abstract class WorldUIProvider : MonoBehaviour
     {
-        Transform WorldAnchor { get; }
-        IEnumerable<UIRequest> GetWorldUI();
+        public abstract Transform WorldAnchor { get; }
+        public abstract IEnumerable<UIRequest> GetWorldUI();
+        public abstract void OnTargetedEnter();
+        public abstract void OnTargetedExit();
     }
 }

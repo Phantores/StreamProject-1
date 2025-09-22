@@ -132,7 +132,7 @@ public enum StateEnum
         void OnReloadTap() => HandleReload();
         void OnInteract() => Interact();
 
-        void Interact() { Debug.Log("PressedInteract");  _ctx.ih.CastInteract(); }
+        void Interact() { _ctx.ih.CastInteract(); }
         void SetSemiFire() {
             if (_ctx.ih._isInteracting) _ctx.ih.ThrowObject();
             if (_ctx.wh.GetCurrentWeapon() == null) return;

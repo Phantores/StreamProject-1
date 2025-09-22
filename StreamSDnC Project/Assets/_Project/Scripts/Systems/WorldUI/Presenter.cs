@@ -19,7 +19,7 @@ namespace WorldUI{
 
         public virtual void Attach(Camera cam, UIRequest request)
         {
-            if(!Rect) Rect = transform as RectTransform;
+            if(!Rect) Rect = GetComponent<RectTransform>();
             if(!Group) Group = gameObject.GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
             _cam = cam;
             Anchor = request.Anchor;

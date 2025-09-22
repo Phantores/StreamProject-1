@@ -8,7 +8,10 @@ namespace WorldUI{
 
         public override void ApplyData(IWorldUIData data)
         {
-            if (Image == null) Image = GetComponentInChildren<Image>(true);
+            if (Image == null) {
+                Image = GetComponent<Image>();
+                if (Image == null) Debug.LogWarning("Haven't found any image in children");
+            }
             if (data is IconData d)
             {
                 Image.sprite = d.sprite;

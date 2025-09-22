@@ -10,6 +10,7 @@ public class WorldUIManager : Singleton<WorldUIManager>
     [Header("Prefabs")]
     public IconPresenter IconPrefab;
     public NameplatePresenter NamePlatePrefab;
+    public BarPresenter BarPrefab;
 
     [Header("Pooling")]
     public int PrewarmPerType = 8;
@@ -17,8 +18,9 @@ public class WorldUIManager : Singleton<WorldUIManager>
     Camera _cam;
     Pool<IconPresenter> _iconPool;
     Pool<NameplatePresenter> _nameplatePool;
+    Pool<BarPresenter> _barPool;
 
-    readonly Dictionary<(IWorldUIProvider provider, WidgetType type), Presenter> _active = new();
+    readonly Dictionary<(WorldUIProvider provider, WidgetType type), Presenter> _active = new();
 
     protected override void Awake()
     {
@@ -27,8 +29,9 @@ public class WorldUIManager : Singleton<WorldUIManager>
         _cam = Camera.main;
 
         var parent = Canvas ? Canvas.transform : transform;
-        if (IconPrefab)     _iconPool       = new Pool<IconPresenter>(IconPrefab, parent, PrewarmPerType);
-        if (NamePlatePrefab)_nameplatePool  = new Pool<NameplatePresenter>(NamePlatePrefab, parent, PrewarmPerType);
+        if (IconPrefab)     _iconPool       = new Pool<IconPresenter>       (IconPrefab, parent, PrewarmPerType);
+        if (NamePlatePrefab)_nameplatePool  = new Pool<NameplatePresenter>  (NamePlatePrefab, parent, PrewarmPerType);
+        if(BarPrefab)       _barPool        = new Pool<BarPresenter>        (BarPrefab, parent, PrewarmPerType);
     }
 
     public void SetCamera(Camera cam) => _cam = cam;
@@ -42,7 +45,7 @@ public class WorldUIManager : Singleton<WorldUIManager>
         }
     }
 
-    public void Submit(IWorldUIProvider provider)
+    public void Submit(WorldUIProvider provider)
     {
         if (provider == null) return;
 
@@ -72,7 +75,7 @@ public class WorldUIManager : Singleton<WorldUIManager>
         foreach (var key in _toRecycle) DespawnKey(key);
     }
 
-    public void ClearAll(IWorldUIProvider provider)
+    public void ClearAll(WorldUIProvider provider)
     {
         _toRecycle.Clear();
         foreach (var kv in _active) if (kv.Key.provider == provider) _toRecycle.Add(kv.Key);
@@ -88,6 +91,7 @@ public class WorldUIManager : Singleton<WorldUIManager>
         {
             WidgetType.Icon => _iconPool?.Spawn(),
             WidgetType.Nameplate => _nameplatePool?.Spawn(),
+            WidgetType.Bar => _barPool?.Spawn(),
             _ => null
         };
 
@@ -98,7 +102,7 @@ public class WorldUIManager : Singleton<WorldUIManager>
         return p;
     }
 
-    void DespawnKey((IWorldUIProvider provider, WidgetType type) key)
+    void DespawnKey((WorldUIProvider provider, WidgetType type) key)
     {
         if(!_active.TryGetValue(key, out var p) || p == null)
         {
@@ -111,11 +115,12 @@ public class WorldUIManager : Singleton<WorldUIManager>
         {
             case WidgetType.Icon: _iconPool?.Despawn((IconPresenter)p); break;
             case WidgetType.Nameplate: _nameplatePool?.Despawn((NameplatePresenter)p); break;
+            case WidgetType.Bar: _barPool?.Despawn((BarPresenter)p); break;
             default: Destroy(p.gameObject); break;
         }
         _active.Remove(key);
     }
 
-    readonly HashSet<(IWorldUIProvider, WidgetType)> _seenKeys = new();
-    readonly List<(IWorldUIProvider, WidgetType)> _toRecycle = new();
+    readonly HashSet<(WorldUIProvider, WidgetType)> _seenKeys = new();
+    readonly List<(WorldUIProvider, WidgetType)> _toRecycle = new();
 }

@@ -2,17 +2,55 @@ using UnityEngine;
 using System.Collections.Generic;
 using WorldUI;
 
-public class IconTargetProvider : MonoBehaviour, IWorldUIProvider
+public class IconTargetProvider : WorldUIProvider
 {
     public Transform uiSocket;
     public Sprite icon;
+    public Sprite targetIcon;
 
-    public Transform WorldAnchor => uiSocket ? uiSocket : transform;
+    public Vector2 iconSize = new Vector2(32, 32);
 
-    public IEnumerable<UIRequest> GetWorldUI()
+    bool targeted;
+
+    Sprite toPass => targeted && targetIcon ? targetIcon : icon;
+
+    public override Transform WorldAnchor => uiSocket ? uiSocket : transform;
+
+    public override IEnumerable<UIRequest> GetWorldUI()
     {
-        if(icon)
+        if (icon)
+        {
             yield return new UIRequest(WidgetType.Icon, WorldAnchor,
-                new IconData {sprite = icon, size = new Vector2(32, 32)}, priority: 0);
+                new IconData { sprite = toPass, size = iconSize }, priority: 0);
+        }
+    }
+
+    private void OnEnable()
+    {
+        WorldUIManager.Instance.Submit(this);
+    }
+
+    void OnDisable()
+    {
+        WorldUIManager.Instance.ClearAll(this);
+    }
+
+    void OnDestroy()
+    {
+        WorldUIManager.Instance.ClearAll(this);
+    }
+
+    public override void OnTargetedEnter()
+    {
+        if(targetIcon)
+        {
+            targeted = true;
+            WorldUIManager.Instance.Submit(this);
+        }
+    }
+    public override void OnTargetedExit()
+    {
+        targeted = false;
+        WorldUIManager.Instance.Submit(this);
     }
 }

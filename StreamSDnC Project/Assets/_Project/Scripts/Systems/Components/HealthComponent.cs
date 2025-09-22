@@ -7,6 +7,8 @@ public class HealthComponent : MonoBehaviour
 
     [field: SerializeField] public bool deathMode { get; private set; }
 
+    public System.Action<float> onHealthChanged;
+
     private void Update()
     {
         if (Health <= 0) Death();
@@ -16,6 +18,7 @@ public class HealthComponent : MonoBehaviour
     public void Damage(float damage)
     {
         Health -= damage;
+        onHealthChanged?.Invoke(Health / maxHealth);
         Debug.Log($"{gameObject.name}: I was hit with {damage} damage");
     }
 

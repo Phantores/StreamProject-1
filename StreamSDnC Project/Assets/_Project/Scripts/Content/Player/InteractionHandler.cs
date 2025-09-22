@@ -23,7 +23,6 @@ namespace Player{
 
         public void CastInteract()
         {
-            Debug.Log("CastInteracting");
             // 1. Check if you hold
             if(_isInteracting)
             {
@@ -107,12 +106,10 @@ namespace Player{
 
             if(best)
             {
-                Debug.Log("Found best candidate");
                 heldInteractable = best.gameObject.GetComponent<Interactable>();
             }
             if (heldInteractable != null && heldInteractable.needsLineOfSight)
             {
-                Debug.Log("Found interactable before LOS check");
                 bool check = _ctx.QuerySensor.HasLineOfSight(best);
                 if (!check) heldInteractable = null;
             }
