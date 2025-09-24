@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="EncodableAsset" id="{63759a7e-ec10-4c1f-85ae-32b06e6e341c}">
+		<property name="assetPath">
+			<value>FastStorage/</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{bab86110-c88b-41b2-82e5-0d89fd7f2776}</destination>
+		</relationship>
+	</object>
+</objects>

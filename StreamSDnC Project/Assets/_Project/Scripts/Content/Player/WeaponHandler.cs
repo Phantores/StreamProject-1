@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Audio;
 using UnityEngine;
 
 namespace Player.Weapons{
@@ -235,6 +236,7 @@ namespace Player.Weapons{
             {
                 currentAmmo--;
                 wh.Shoot(Time.time - chargeTimeStamp, this, gameData.recoil[currentAmmo]);
+                if(data.ViewData.gunshotSound) AudioManager.Instance.PlayUntracked(data.ViewData.gunshotSound, wh._ctx.Runner.transform.position);
                 return true;
             }
             else if (reserveAmmo > 0 && !firedOnce)

@@ -1,12 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
 using WorldUI;
+using Audio;
 
 public class IconTargetProvider : WorldUIProvider
 {
     public Transform uiSocket;
     public Sprite icon;
     public Sprite targetIcon;
+
+    public Audio.Event targetSound;
 
     public Vector2 iconSize = new Vector2(32, 32);
 
@@ -51,6 +54,7 @@ public class IconTargetProvider : WorldUIProvider
     public override void OnTargetedExit()
     {
         targeted = false;
+        if (targetSound) AudioManager.Instance.PlayUntracked2D(targetSound);
         WorldUIManager.Instance.Submit(this);
     }
 }

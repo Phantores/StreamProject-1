@@ -16,15 +16,21 @@ MonoBehaviour:
   - {fileID: 3881011301044422381}
   - {fileID: 8611999369355536490}
   - {fileID: 1181438035172077060}
-  EditorEvents: []
+  EditorEvents:
+  - {fileID: 9108963289113278249}
+  - {fileID: 4560232282451358253}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8611999369355536490}
   StringsBanks:
   - {fileID: 3881011301044422381}
   cacheVersion: 131848
-  cacheTime: 638943250088447202
-  SerializableEventsDict: []
+  cacheTime: 638943331349571810
+  SerializableEventsDict:
+  - key: event:/Sounds/SFX/_DebugClick
+    index: 0
+  - key: event:/Sounds/SFX/_DebugGun
+    index: 1
 --- !u!114 &1181438035172077060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40,10 +46,10 @@ MonoBehaviour:
   Path: ../FMOD Project/StreamSDnC proj ichi/Build/Desktop/SFX.bank
   Name: SFX
   StudioPath: bank:/SFX
-  lastModified: 638943250088447202
+  lastModified: 638943331349571810
   FileSizes:
   - Name: Desktop
-    Value: 506
+    Value: 14304
   Exists: 1
 --- !u!114 &3881011301044422381
 MonoBehaviour:
@@ -60,11 +66,38 @@ MonoBehaviour:
   Path: ../FMOD Project/StreamSDnC proj ichi/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638943250088421822
+  lastModified: 638943331348353903
   FileSizes:
   - Name: Desktop
-    Value: 912
+    Value: 1018
   Exists: 1
+--- !u!114 &4560232282451358253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sounds/SFX/_DebugGun
+  m_EditorClassIdentifier: 
+  Path: event:/Sounds/SFX/_DebugGun
+  Guid:
+    Data1: -1008163167
+    Data2: 1096145306
+    Data3: 145455005
+    Data4: 1994347714
+  Banks:
+  - {fileID: 1181438035172077060}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 472
 --- !u!114 &8611999369355536490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,8 +113,35 @@ MonoBehaviour:
   Path: ../FMOD Project/StreamSDnC proj ichi/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638943250088401603
+  lastModified: 638943331348338851
   FileSizes:
   - Name: Desktop
     Value: 1670
   Exists: 1
+--- !u!114 &9108963289113278249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Sounds/SFX/_DebugClick
+  m_EditorClassIdentifier: 
+  Path: event:/Sounds/SFX/_DebugClick
+  Guid:
+    Data1: -953840888
+    Data2: 1128679956
+    Data3: -1580956780
+    Data4: -55608600
+  Banks:
+  - {fileID: 1181438035172077060}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 345

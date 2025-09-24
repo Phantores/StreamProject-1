@@ -16,6 +16,7 @@ MonoBehaviour:
   viewData:
     <prefab>k__BackingField: {fileID: 4916201065071736691, guid: 6a027c474c7268146a97d10c639a0f7c, type: 3}
     animatorController: {fileID: 9100000, guid: 362ad8b23f816fd4f95d787f95c0730a, type: 2}
+    <gunshotSound>k__BackingField: {fileID: 11400000, guid: 0902c7c43179d4248b0d6e6013e9e75f, type: 2}
   gameData:
     fireMode: 0
     chargeTime: 0

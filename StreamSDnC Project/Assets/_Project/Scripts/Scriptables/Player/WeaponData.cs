@@ -34,6 +34,8 @@ namespace Player.Weapons{
     {
         [field: SerializeField] public ModelController prefab {  get; private set; }
         [field: SerializeField] public AnimatorController animatorController;
+
+        [field: SerializeField] public Audio.Event gunshotSound { get; private set; }
     }
     [System.Serializable]
     public class WeaponGameData
