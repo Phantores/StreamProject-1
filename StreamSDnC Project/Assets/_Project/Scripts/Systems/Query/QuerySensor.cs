@@ -131,7 +131,7 @@ public class QuerySensor : MonoBehaviour
         };
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         float angleRad = Mathf.Deg2Rad * halfAngleDeg;
